@@ -24,3 +24,16 @@ all of the fitted models estimates. We now only need to keep the columns of inte
 are Intecept Estimation and X-variable Estimation. 
 
 ---------------------------------------------------------
+
+TIMERS FOR DIFFERENT NUMBER OF LOOPS
+
+TABLE
+|   N    | Provided Code | Updated code | 
+-----------------------------------------
+|  20    | Provided Code | Updated code | 
+|  100   | Provided Code | Updated code | 
+|  500   | Provided Code | Updated code | 
+|  1000  | Provided Code | Updated code | 
+|  5000  | Provided Code | Updated code | 
+|  10000 | Provided Code | Updated code | 
+|  20000 | Provided Code | Updated code | 
