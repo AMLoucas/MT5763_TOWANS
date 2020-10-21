@@ -48,6 +48,7 @@ RUN;
 
 %MEND;
 
+OPTIONS NONOTES;
 
 /* Start the times, to count the function */
 %let _timer_start = %sysfunc(datetime());
