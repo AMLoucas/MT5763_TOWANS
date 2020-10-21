@@ -13,7 +13,7 @@ PROC CONTENTS DATA=WORK.SEALS_UPDATED;
 RUN;
 
 /* Boostrap function */
-%MACRO bootStrap(DataFile, X, Y);
+%MACRO bootStrap(DataFile, X, Y, SampleSet);
 
 /* Bootstrap loop for simulating data */
 PROC SURVEYSELECT 
@@ -23,7 +23,7 @@ PROC SURVEYSELECT
 	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
 	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
 	/* OUTHITS = ENSURES EACH RECORD IS SAVED, RATHER THAN JUST 1 SIMULATION */
-	method=urs noprint SAMPRATE=1 outhits rep=20;
+	method=urs noprint SAMPRATE=1 outhits rep=&SampleSet;
 RUN;
 
 
@@ -54,11 +54,12 @@ OPTIONS NONOTES;
 %let _timer_start = %sysfunc(datetime());
 
 /* Calling function */
-%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone);
+%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 50000);
 
 /* Stop timer, obtain time taken to execute program */
 data _null_;
   dur = datetime() - &_timer_start;
   put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
 run;
+
 
