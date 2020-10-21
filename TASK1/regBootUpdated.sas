@@ -12,7 +12,13 @@ RUN;
 PROC CONTENTS DATA=WORK.SEALS_UPDATED; 
 RUN;
 
-/* Boostrap function */
+/* Boostrap function
+	Takes 4 arguments:
+	DataFile -> Data file that contains data we will be working with
+	X -> The predictor being used in model
+	Y -> The response varibale being used in model
+	SampleSet -> Number of sample sets to be created (number of loops)
+	*/
 %MACRO bootStrap(DataFile, X, Y, SampleSet);
 
 /* Bootstrap loop for simulating data */
@@ -54,12 +60,10 @@ OPTIONS NONOTES;
 %let _timer_start = %sysfunc(datetime());
 
 /* Calling function */
-%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 50000);
+%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 100000);
 
 /* Stop timer, obtain time taken to execute program */
 data _null_;
   dur = datetime() - &_timer_start;
   put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
 run;
-
-
