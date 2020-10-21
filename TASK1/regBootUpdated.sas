@@ -15,35 +15,39 @@ RUN;
 /* Boostrap function */
 %MACRO bootStrap(DataFile, X, Y);
 
-/*Number of rows in my dataset*/
-DATA _null_;
-	set &DataFile NOBS=size;
-	call symput("NROW",size);
-	stop;
-RUN;
- 
 /* Bootstrap loop for simulating data */
 PROC SURVEYSELECT 
 	data=&DataFile
 	out=WORK.bootData seed=23434
-	method=urs noprint sampsize=&NROW outhits rep=20;
+	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
+	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
+	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
+	/* OUTHITS = ENSURES EACH RECORD IS SAVED, RATHER THAN JUST 1 SIMULATION */
+	method=urs noprint SAMPRATE=1 outhits rep=20000;
 RUN;
+
 
 /* Create model for each loop/simulation */
 PROC REG data=WORK.bootData 
 	outest=WORK.ESTIMATES  noprint;
 	Model &Y=&X;
+	/* REPLICATE = VARIABLE THAT WORKS AS A SIMULATION INDEX. ALL RANDOM SAMPLES
+		FROM THE SAME SIMULATION HOLD THE SAME REPLICATE VALUE */
+	/* BY REPLICATE = MEANS A MODEL WILL BE FITTED FOR EACH SIMULATION THAT WAS APPLIED */
 	BY Replicate;
 RUN;
 QUIT;
 
-/*Extract just the columns for slope and intercept for storage*/
+/*Extract just the columns for slope and intercept for storage */
 DATA WORK.ESTIMATES;
 	SET WORK.ESTIMATES;
 	KEEP Intercept &X;
 	RENAME Intercept=RandomIntercept &X=RandomSlope;	
 RUN;
+
 %MEND;
 
 
+
 %bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone);
+
