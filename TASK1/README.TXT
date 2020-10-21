@@ -30,10 +30,12 @@ TIMERS FOR DIFFERENT NUMBER OF LOOPS
 TABLE
 |   N    | Provided Code | Updated code | 
 -----------------------------------------
-|  20    | Provided Code | Updated code | 
-|  100   | Provided Code | Updated code | 
-|  500   | Provided Code | Updated code | 
-|  1000  | Provided Code | Updated code | 
-|  5000  | Provided Code | Updated code | 
-|  10000 | Provided Code | Updated code | 
-|  20000 | Provided Code | Updated code | 
+|  20    |   0:00:00.59  |  0:00:00.04  | 
+|  100   |   0:00:02.44  |  0:00:00.04  | 
+|  500   |   0:00:11.71  |  0:00:00.09  | 
+|  1000  |   0:00:23.78  |  0:00:00.11  | 
+|  5000  |   0:01:59.56  |  0:00:00.41  | 
+|  10000 |   0:04:01.78  |  0:00:00.79  | 
+|  20000 |   0:08:42.88  |  0:00:01.53  | 
+|  50000 |   0:23:31.36  |  0:00:03.69  | 
+|  100000|   ----------  |  0:00:07.79  | 
