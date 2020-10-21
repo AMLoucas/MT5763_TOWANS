@@ -10,6 +10,27 @@
 /*	- ResultHolder: A SAS dataset with NumberOfLoops rows and two columns, RandomIntercept & RandomSlope*/
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+
+/* Importing seals.csv file to run bootstrap code */
+FILENAME REFFILE '/folders/myfolders/sasuser.v94/GROUP-BootStrap/seals.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=WORK.SEALS;
+	GETNAMES=YES;
+	GUESSINGROWS=MAX;
+RUN;
+
+PROC CONTENTS DATA=WORK.SEALS; 
+RUN;
+
+
+ 	data WORK.TESTER;
+  	set WORK.SEALS NOBS=size;
+  	call symput("NROW",size);
+ 	stop;
+ 	run;
+
 %macro regBoot(NumberOfLoops, DataSet, XVariable, YVariable);
 
 
@@ -25,7 +46,8 @@
 
 
 /*Sample my data with replacement*/
-	proc surveyselect data=&DataSet out=bootData seed=-23434 method=urs noprint sampsize=&NROW;
+	proc surveyselect data=&DataSet 
+	out=bootData seed=-23434 method=urs noprint sampsize=&NROW;
 	run;
 
 /*Conduct a regression on this randomised dataset and get parameter estimates*/
@@ -58,7 +80,18 @@ run;
 %mend;
 
 options nonotes;
-/*Run the macro*/
-%regBoot(NumberOfLoops=, DataSet=, XVariable=, YVariable=);
+
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
+
+/* Calling function */
+%regBoot(NumberOfLoops=20, DataSet=WORK.SEALS, XVariable=Lengths, YVariable=Testosterone);
+
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
+fLoops=, DataSet=, XVariable=, YVariable=);
 
 

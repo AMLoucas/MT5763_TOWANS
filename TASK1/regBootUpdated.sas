@@ -23,7 +23,7 @@ PROC SURVEYSELECT
 	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
 	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
 	/* OUTHITS = ENSURES EACH RECORD IS SAVED, RATHER THAN JUST 1 SIMULATION */
-	method=urs noprint SAMPRATE=1 outhits rep=20000;
+	method=urs noprint SAMPRATE=1 outhits rep=20;
 RUN;
 
 
@@ -41,6 +41,7 @@ QUIT;
 /*Extract just the columns for slope and intercept for storage */
 DATA WORK.ESTIMATES;
 	SET WORK.ESTIMATES;
+	/* Keeping 2 columns of interest and renaming to appropriate names */
 	KEEP Intercept &X;
 	RENAME Intercept=RandomIntercept &X=RandomSlope;	
 RUN;
@@ -48,6 +49,15 @@ RUN;
 %MEND;
 
 
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
 
+/* Calling function */
 %bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone);
+
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
 
