@@ -24,64 +24,75 @@ RUN;
 	*/
 %MACRO jackKnife(Datafile, X);
 
-	DATA Vec;
-	SET &Datafile;
-	KEEP &X;
-	RUN;
+/*command for extracting the sample mean*/
+PROC UNIVARIATE DATA=Vec noprint; 
+VAR &X;
+OUTPUT out=MEANX mean=sampmean;
+RUN;
+
+/*need to acquire size of the dataset (n) to know how many replicates will be needed*/
+PROC SQL NOPRINT;
+SELECT count(*) into :size from Vec;
+QUIT;
+    
+/*obtain a dataset which is the sample mean repeated n times for later calculation*/
+PROC SURVEYSELECT DATA=MEANX OUT=SAMPMEAN
+method=srs samprate=1 rep=&SIZE. ;
+RUN;
 	
-	PROC UNIVARIATE DATA=Vec noprint; 
-    VAR &X;
-    OUTPUT out=MEANX mean=sampmean;
-    RUN;
+/*obtain n replications of the original data set*/
+PROC SURVEYSELECT DATA=Vec OUT=VecLong
+method=srs samprate=1 rep=&SIZE. ;
+RUN;
+
+/*delete sample i for each ith replication*/
+DATA VecJack / VIEW = VecJack;
+SET VecLong;
+if replicate=mod(_n_,&SIZE.)+1 then delete;
+RUN;
+ 
+/*obtain the mean of each jackknifed sample*/
+PROC UNIVARIATE data=VecJack noprint; 
+VAR &X;
+BY replicate;
+OUTPUT out=jackMeans mean=mean;
+RUN;
     
-    PROC SQL NOPRINT;
- 	SELECT count(*) into :size from Vec;
- 	QUIT;
+/*obtain the squared difference from the sample mean*/
+DATA SquareDiffs;
+MERGE jackMeans SampMean;
+BY replicate;
+SquareDiff = (mean - sampmean)**2;
+RUN;
     
-    PROC SURVEYSELECT DATA=MEANX OUT=SAMPMEAN
- 	method=srs samprate=1 rep=&SIZE. ;
- 	RUN;
+/*get the sum of the squared differences*/
+PROC SUMMARY DATA=SquareDiffs;
+VAR SquareDiff;
+OUTPUT out=TotalDiffs sum=tot;
+RUN;
 	
-	PROC SURVEYSELECT DATA=Vec OUT=VecLong
- 	method=srs samprate=1 rep=&SIZE. ;
- 	RUN;
+/*calculate the standard error for storage*/
+DATA Estimate;
+SET TotalDiffs;
+SE = SQRT((&SIZE. - 1) / &SIZE. * tot);
+KEEP SE;
+RUN;
  	
-	DATA VecJack / VIEW=VecJack;
- 	set VecLong;
- 	if replicate=mod(_n_,&SIZE.)+1 then delete;
- 	RUN;
- 	
- 	PROC UNIVARIATE data=VecJack noprint; 
-    VAR &X;
-    BY replicate;
-    OUTPUT out=jackMeans mean=mean;
-    RUN;
-    
-    DATA MeanDiffs;
-    MERGE jackMeans SampMean;
-    BY replicate;
-    RUN;
-    
-    DATA SquareDiffs;
-    SET MeanDiffs;
-    SquareDiff = (mean - sampmean)**2;
-    RUN;
-    
-    PROC SUMMARY DATA=SquareDiffs;
-	var SquareDiff;
-	output out=TotalDiffs sum=tot;
-	RUN;
-	
-	DATA Estimate;
-	SET TotalDiffs;
-	SE = SQRT((&SIZE. - 1) / &SIZE. * tot);
-	KEEP SE;
-	RUN;
- 	
- 	%MEND;
- 	
+%MEND;
+
+OPTIONS NONOTES;
+
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
+
+/* Calling function */
 %jackKnife(WORK.SEALS, Lengths)
  	
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
  
  	
  	
