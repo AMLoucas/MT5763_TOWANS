@@ -46,3 +46,9 @@ output: html_document
 
 
 
+## APPENDIX
+<!-- Full code snippets of the tasks -->
+
+
+
+
