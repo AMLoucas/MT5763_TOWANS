@@ -1,5 +1,45 @@
 ---
 title: "MT5763_TOWANS"
 output: html_document
+align: "center"
 ---
+
+#### General GitHub repository: [https://github.com/AMLoucas/MT5763_TOWANS](https://github.com/AMLoucas/MT5763_TOWANS)
+
+#### Shiny GitHub repository: [https://github.com/janfor1/MT5763_Shiny](https://github.com/janfor1/MT5763_Shiny)
+
+
+## Introduction
+
+## Abstract
+
+
+
+
+## TASK-1 [Shiny app (R)]
+
+
+
+
+## TASK-2 [Bootstrap (SAS)]
+
+
+
+
+## TASK-3 [Jackknife (SAS)]
+
+
+
+
+## TASK-4 [Monte Carlo simulation (R)]
+
+#### Problem-A 
+
+
+
+
+#### Problem-B 
+
+
+
 
