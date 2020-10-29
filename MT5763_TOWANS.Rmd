@@ -1,7 +1,6 @@
 ---
 title: "MT5763_TOWANS"
 output: html_document
-align: "center"
 ---
 
 #### General GitHub repository: [https://github.com/AMLoucas/MT5763_TOWANS](https://github.com/AMLoucas/MT5763_TOWANS)
@@ -39,6 +38,10 @@ align: "center"
 
 
 #### Problem-B 
+
+## Conclusions
+<!-- We can talk in general our results, what we found difficult and not. How we worked as a team -->
+<!-- General for all exercises (Main result points)-->
 
 
 
