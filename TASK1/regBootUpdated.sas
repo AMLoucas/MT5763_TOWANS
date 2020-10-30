@@ -60,10 +60,37 @@ OPTIONS NONOTES;
 %let _timer_start = %sysfunc(datetime());
 
 /* Calling function */
-%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 100000);
+%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 5000);
 
 /* Stop timer, obtain time taken to execute program */
 data _null_;
   dur = datetime() - &_timer_start;
   put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
 run;
+
+/* GET THE 95% CI of our estimates*/
+PROC UNIVARIATE 
+	data=WORK.ESTIMATES;
+	VAR RandomIntercept;
+	OUTPUT out=WORK.InterceptCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
+RUN;
+
+PROC UNIVARIATE 
+	data=WORK.ESTIMATES;
+	VAR RandomSlope;
+	OUTPUT out=WORK.SlopeCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
+RUN;
+
+/* WE PLOT ESTIMATES TO VIEW THE CI */  
+PROC SGPLOT data = WORK.ESTIMATES;
+	TITLE "HISTOGRAM OF THE RANDOM INTERCEPT";
+	HISTOGRAM RandomIntercept;
+RUN;
+TITLE;
+
+PROC SGPLOT data = WORK.ESTIMATES;
+	TITLE "HISTOGRAM OF THE RANDOM SLOPE (LENGTH)";
+	HISTOGRAM RandomSlope;
+RUN;
+TITLE;
+
