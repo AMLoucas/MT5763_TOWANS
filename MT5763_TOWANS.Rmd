@@ -10,7 +10,12 @@ output: html_document
 
 ## Introduction
 
-## Abstract
+  The purpose of this project is to display the programming skills acquired in SAS, R and version control "GIT". We were working as a team to undertake each task to accomplish the deliverable. We had to perform our version control knowledge using GIT, to communicate and work on our tasks simultaneously. The project is divided into 4 individual independent tasks: \
+  For task 1, we had to create a Shiny application in R. Our application communicates with a stock exchange API every one hour and pulls updated data. The user of the application has the functionality to request updated data before the hour mark and download the data he has acquired. Additionally, the software visualizes the data pulled from the API using graphs and plots. The user is capable to adjust the graphs to his preferences and examine the intervals he is mostly interested in. \
+  For task 2, we were provided with a SAS bootstrap code and we had to optimize the code to make it faster. Once the code was optimized and the speed-up level has improved, we had to obtain and visualize the 95% confidence intervals for our two coefficients from the provided data and compare with the confidence intervals that the SAS built-in procedures offer. \
+  For task 3, we had to code and implement a Jackknife algorithm using SAS. Once Jackknife was implemented we had to use the function to obtain the estimates of the standard error and mean of the provided data. After the simulations were accomplished we compared our results. \
+  For task4, we had to write and implement a Monte Carlo Simulation using R. We had to use parallel computations in the implementation. We were provided with two different problem questions and we had to use our Monte Carlo Simulation results to answer them. \
+  The data that was used in Task 2 & 3, is a fictional dataset of male hormone levels in seals of different lengths. \
 
 
 
