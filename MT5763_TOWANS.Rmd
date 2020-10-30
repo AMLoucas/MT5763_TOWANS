@@ -18,8 +18,6 @@ output: html_document
   The data that was used in Task 2 & 3, is a fictional dataset of male hormone levels in seals of different lengths. \
 
 
-
-
 ## TASK-1 [Shiny app (R)]
 
 
