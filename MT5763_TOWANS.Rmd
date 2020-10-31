@@ -2,7 +2,11 @@
 title: "MT5763_TOWANS"
 output: html_document
 ---
-
+```{r, include=FALSE}
+# Allow to include graphics in report.
+options(tinytex.verbose = TRUE)
+library(knitr)
+```
 
 
 #### General GitHub repository: [https://github.com/AMLoucas/MT5763_TOWANS](https://github.com/AMLoucas/MT5763_TOWANS)
@@ -141,7 +145,11 @@ We now obtained the 95% confidence interval for the parameter estimators on Inte
  \
 We also plotted the parameter estimates in histograms to visualize the distribution. \
 
-
+```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+# All defaults
+include_graphics("TASK1/Intercept-estimate.png")
+include_graphics("TASK1/Sope-Intercept.png")
+```
 
 
 
