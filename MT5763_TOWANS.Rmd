@@ -3,6 +3,8 @@ title: "MT5763_TOWANS"
 output: html_document
 ---
 
+
+
 #### General GitHub repository: [https://github.com/AMLoucas/MT5763_TOWANS](https://github.com/AMLoucas/MT5763_TOWANS)
 
 #### Shiny GitHub repository: [https://github.com/janfor1/MT5763_Shiny](https://github.com/janfor1/MT5763_Shiny)
@@ -25,6 +27,77 @@ output: html_document
 
 ## TASK-2 [Bootstrap (SAS)]
 
+  In this exercise question we were provided a not very efficient bootstrap code and we had to modify the code, resulting to a more efficient bootstrap. We applied 4 main changes that optimize and make our bootstrap code more efficient. \
+  
+ * **We did not manually compute the number of rows of the original dataset.** \
+
+When applying the simulation, we want our sample data to have the same number rows as the original dataset. In the provided code the number of rows are obtained using code: \
+```
+/*Number of rows in my dataset*/
+ 	data _null_;
+  	set &DataSet NOBS=size;
+  	call symput("NROW",size);
+ 	stop;
+ 	run;
+```
+In the updated version, we do not use this approach. The in-built SAS function surveyselect supplies a field/method that automatically computes the number of rows of the dataset you are applying re-sampling. The method name is "SAMPRATE = ?? ". By assigning this field with the value 1 or 100, the number of rows will be computed for you. \
+```
+PROC SURVEYSELECT 
+	data=&DataFile
+	out=WORK.bootData seed=23434
+	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
+	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
+	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
+	/* OUTHITS = ENSURES EACH RECORD IS SAVED, RATHER THAN JUST 1 SIMULATION */
+	method=urs noprint SAMPRATE=1 outhits rep=&SampleSet;
+RUN;
+```
+
+  * **We did not use a loop to accomplish our N re-sampling simulations.** \
+
+In the code provided the different simulation of bootstrapping is computed with a "for loop" . This was not a good approach, because the algorithm would obtain the re-sampled data and apply computations on it. This would be repeated for our N number of simulations. A more efficient approach is to compute all the bootstrap simulations in advance and apply the computation on the datasets at once. We computed all our N bootstrap simulations using a field/method from the in-built SAS function surveyselect. The name of the field/method is "rep = ?? ", we assigned "rep" with the number of bootstrap re-sampling datasets we want to construct. \
+```
+/* Bootstrap loop for simulating data */
+PROC SURVEYSELECT 
+	data=&DataFile
+	out=WORK.bootData seed=23434
+	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
+	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
+	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
+	/* OUTHITS = ENSURES EACH RECORD IS SAVED, RATHER THAN JUST 1 SIMULATION */
+	method=urs noprint SAMPRATE=1 outhits rep=&SampleSet;
+RUN;
+```
+
+ * **We did not fit the linear model 1-by-1 for each sample dataset.** \
+
+Because we used "rep", the sample datasets constructed were supplied with an extra column called "REPLICATE". This field holds an integer value that indicates in which re-sampling iteration the row/data belongs to. We could than apply a model for each re-sampled dataset at once, with no need to iterate through each dataset and fit a model 1-by-1. This was accomplished by the command line "BY REPLICATE". This would automatically divide the datasets with the replicate value and fit the regression model using each iterations values. \
+```
+/* Create model for each loop/simulation */
+PROC REG data=WORK.bootData 
+	outest=WORK.ESTIMATES  noprint;
+	Model &Y=&X;
+	/* REPLICATE = VARIABLE THAT WORKS AS A SIMULATION INDEX. ALL RANDOM SAMPLES
+		FROM THE SAME SIMULATION HOLD THE SAME REPLICATE VALUE */
+	/* BY REPLICATE = MEANS A MODEL WILL BE FITTED FOR EACH SIMULATION THAT WAS APPLIED */
+	BY Replicate;
+RUN;
+QUIT;
+```
+
+ * **We did not append our estimates results 1-by-1 for each iteration.** \
+ 
+Since we used the "BY REPLICATE" command line, we had all our model results in one table at once.We extracted a subset from the fitted models result table that we were interested in one command line. We did not need to pull our fields of interest for each iteration and append it in a different table. \
+```
+/*Extract just the columns for slope and intercept for storage */
+DATA WORK.ESTIMATES;
+	SET WORK.ESTIMATES;
+	/* Keeping 2 columns of interest and renaming to appropriate names */
+	KEEP Intercept &X;
+	RENAME Intercept=RandomIntercept &X=RandomSlope;	
+RUN;
+```
+These were all the changes that were applied to modify the bootstrap algorithm and make it more efficient. We then run simulation test with different number for N iterations. We used timers to calculate the time needed to execute the whole bootstrap function. The table that holds the different times for each N on both algorithms is appended below. \
 
 
 |    N   	|   regBoot  	| regBootUpdated 	|
@@ -33,11 +106,44 @@ output: html_document
 |   100  	| 0:00:02.44 	|   0:00:00.04   	|
 |   500  	| 0:00:11.71 	|   0:00:00.09   	|
 |  1000  	| 0:00:23.78 	|   0:00:00.11   	|
-|  5000  	| 0:01:59.56 	|    0:00:00.4   	|
+|  5000  	| 0:01:59.56 	|   0:00:00.41   	|
 |  10000 	| 0:04:01.78 	|   0:00:00.79   	|
 |  20000 	| 0:08:42.88 	|   0:00:01.53   	|
 |  50000 	| 0:23:31.36 	|   0:00:03.69   	|
 | 100000 	|    NULL    	|   0:00:07.79   	|
+
+From the table with the recorded times, we can conclude that the updated version (regBootUpdated)
+is indeed more efficient. The times have a huge different, for the large values of N we can see a very big difference. The supplied bootstrap took 23 minutes to execute N = 50000, while the updated version double the simulations in just 7 minutes. \
+Another feature we can notice from the time table is, as N increases the time taken to execute is also rapidly increased. While on the other hand the modified version does not increase on a high scale, but shows small signs of increased times. \
+ \
+In addition to making the algorithm more efficient, we had to compute the 95% Confidence intervals for the parameter estimates of interest. These values can be computed using the SAS in-built function of UNIVARIATE. \
+```
+/* GET THE 95% CI of our estimates*/
+PROC UNIVARIATE 
+	data=WORK.ESTIMATES;
+	VAR RandomIntercept;
+	OUTPUT out=WORK.InterceptCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
+RUN;
+
+PROC UNIVARIATE 
+	data=WORK.ESTIMATES;
+	VAR RandomSlope;
+	OUTPUT out=WORK.SlopeCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
+RUN;
+```
+We now obtained the 95% confidence interval for the parameter estimators on Intercept and slope of length. \
+
+| CI    | RandomSlope | RandomIntercept |
+|:----: |:----------:	|:--------------:	|
+| 2.5%  | 1.8329137 	|   75.015581   	|
+| 97.5% | 2.2245273 	|   118.81835  	  |
+
+ \
+We also plotted the parameter estimates in histograms to visualize the distribution. \
+
+
+
+
 
 
 ## TASK-3 [Jackknife (SAS)]
