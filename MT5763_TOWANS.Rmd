@@ -1,6 +1,7 @@
 ---
 title: "MT5763_TOWANS"
-output: html_document
+output:
+  html_document: default
 ---
 ```{r, include=FALSE}
 # Allow to include graphics in report.
@@ -152,11 +153,175 @@ include_graphics("TASK1/Sope-Intercept.png")
 ```
 
 
-
-
 ## TASK-3 [Jackknife (SAS)]
 
+For this section we demonstrate a SAS program for obtaining the jackknife estimate of the standard error for the mean of given data. The SAS macro created for this purpose proceeds in the following fashion:
 
+### Jackknife Macro
+
+First we extract the sample mean and the size of the dataset. Then we use the SURVEYSELECT process to create a dataset containing n copies of the original data. We also create a dataset containing n copies of the sample mean, as we will later need to compute the difference between each of the jackknife samples and the sample mean.  
+
+```{eval=FALSE}
+FILENAME REFILE '/folders/myfolders/sasuser.v94/seals.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=WORK.SEALS;
+	GETNAMES=YES;
+RUN;
+
+PROC CONTENTS DATA=WORK.SEALS;
+RUN;
+
+
+/*Jackknife Function
+	INPUTS
+	DataFile: the dataset to perform the analysis on
+	X: the variable we want to analyze
+	OUTPUTS
+	estimate for standard error
+	*/
+%MACRO jackKnife(Datafile, X);
+
+/*command for extracting the sample mean*/
+PROC UNIVARIATE DATA=&DataFile noprint; 
+VAR &X;
+OUTPUT out=MEANX mean=sampmean;
+RUN;
+
+/*need to acquire size of the dataset (n) to know how many replicates will be needed*/
+PROC SQL NOPRINT;
+SELECT count(*) into :size from &DataFile;
+QUIT;
+    
+/*obtain a dataset which is the sample mean repeated n times for later calculation*/
+PROC SURVEYSELECT DATA=MEANX OUT=SAMPMEAN
+method=srs samprate=1 rep=&SIZE. ;
+RUN;
+	
+/*obtain n replications of the original data set*/
+PROC SURVEYSELECT DATA=&DataFile OUT=VecLong
+method=srs samprate=1 rep=&SIZE. ;
+RUN;
+```
+
+We then delete sample i for each ith replication of the original data to create the jackknife sample, and then obtain the squared difference with the sample mean for each jackknife sample.
+
+```{eval=FALSE}
+/*delete sample i for each ith replication*/
+DATA VecJack / VIEW = VecJack;
+SET VecLong;
+if replicate=mod(_n_,&SIZE.)+1 then delete;
+RUN;
+ 
+/*obtain the mean of each jackknifed sample*/
+PROC UNIVARIATE data=VecJack noprint; 
+VAR &X;
+BY replicate;
+OUTPUT out=jackMeans mean=mean;
+RUN;
+    
+/*obtain the squared difference from the sample mean*/
+DATA SquareDiffs;
+MERGE jackMeans SampMean;
+BY replicate;
+SquareDiff = (mean - sampmean)**2;
+RUN;
+```
+
+Finally, we sum the squared differences and calculate the standard error, storing it in a dataset called Estimate. 
+
+```{eval=FALSE}
+/*get the sum of the squared differences*/
+PROC SUMMARY DATA=SquareDiffs;
+VAR SquareDiff;
+OUTPUT out=TotalDiffs sum=tot;
+RUN;
+	
+/*calculate the standard error for storage*/
+DATA Estimate;
+SET TotalDiffs;
+SE = SQRT((&SIZE. - 1) / &SIZE. * tot);
+KEEP SE;
+RUN;
+ 	
+%MEND;
+
+OPTIONS NONOTES;
+
+/* Calling function */
+%jackKnife(WORK.SEALS, Lengths)
+```
+
+### Standard Error Calculation and Efficiency Comparison
+
+We also wrote the following SAS program in order to calculate the analytical estimate for standard error of mean length of the seals.
+
+```{eval = FALSE}
+%MACRO SE(Datafile, X);
+
+PROC MEANS DATA = &Datafile STDERR;
+VAR &X;
+output out = StandardEstimate stderr=SE;
+RUN;
+
+%MEND;
+
+/* Calling function */
+%SE(WORK.SEALS, Lengths)
+```
+
+We then ran the following code in order to compare the efficiency of our two processes.
+
+```{eval=FALSE}
+%MACRO loopjack(N);
+%do i=1 %to &N;
+%Jackknife(WORK.SEALS, Lengths);
+%end;
+%mend;
+
+%MACRO loopSE(N);
+%do i=1 %to &N;
+%SE(WORK.SEALS, Lengths);
+%end;
+%mend;
+
+
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
+
+/* Calling function many times for robust estimate */
+%loopSE(20);
+RUN;
+ 	
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
+
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
+
+/* Calling function many times for robust estimate */
+%loopjack(20);
+RUN;
+ 	
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
+```
+
+### Jackknife Final Results
+
+| Method     | Average Time Taken, s (n=20) | SE Estimate, cm |
+|------------|------------------------------|-----------------|
+| Analytical |                0.096         |   0.5537712468  |
+| Jackknife  |                0.308         |   0.5537712468  |
+
+As we can see here our Jackknife process is slightly less efficient than calculating the standard error analytically. We found the exact same value for the standard error as the analytical method so we can infer that we have a reliable estimate. 
 
 
 ## TASK-4 [Monte Carlo simulation (R)]
@@ -252,3 +417,149 @@ data _null_;
   put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
 run;
 ```
+
+#### CODE FOR TASK [3] Jackknifing
+```{eval=FALSE}
+/* MT5763 Group Project */
+/* code for doing jackknife estimation */
+
+FILENAME REFILE '/folders/myfolders/sasuser.v94/seals.csv';
+
+PROC IMPORT DATAFILE=REFFILE
+	DBMS=CSV
+	OUT=WORK.SEALS;
+	GETNAMES=YES;
+RUN;
+
+PROC CONTENTS DATA=WORK.SEALS;
+RUN;
+
+
+/*Jackknife Function
+	INPUTS
+	DataFile: the dataset to perform the analysis on
+	X: the variable we want to analyze
+	OUTPUTS
+	estimate for standard error
+	*/
+%MACRO jackKnife(Datafile, X);
+
+/*command for extracting the sample mean*/
+PROC UNIVARIATE DATA=&DataFile noprint; 
+VAR &X;
+OUTPUT out=MEANX mean=sampmean;
+RUN;
+
+/*need to acquire size of the dataset (n) to know how many replicates will be needed*/
+PROC SQL NOPRINT;
+SELECT count(*) into :size from &DataFile;
+QUIT;
+    
+/*obtain a dataset which is the sample mean repeated n times for later calculation*/
+PROC SURVEYSELECT DATA=MEANX OUT=SAMPMEAN
+method=srs samprate=1 rep=&SIZE. ;
+RUN;
+	
+/*obtain n replications of the original data set*/
+PROC SURVEYSELECT DATA=&DataFile OUT=VecLong
+method=srs samprate=1 rep=&SIZE. ;
+RUN;
+
+/*delete sample i for each ith replication*/
+DATA VecJack / VIEW = VecJack;
+SET VecLong;
+if replicate=mod(_n_,&SIZE.)+1 then delete;
+RUN;
+ 
+/*obtain the mean of each jackknifed sample*/
+PROC UNIVARIATE data=VecJack noprint; 
+VAR &X;
+BY replicate;
+OUTPUT out=jackMeans mean=mean;
+RUN;
+    
+/*obtain the squared difference from the sample mean*/
+DATA SquareDiffs;
+MERGE jackMeans SampMean;
+BY replicate;
+SquareDiff = (mean - sampmean)**2;
+RUN;
+    
+/*get the sum of the squared differences*/
+PROC SUMMARY DATA=SquareDiffs;
+VAR SquareDiff;
+OUTPUT out=TotalDiffs sum=tot;
+RUN;
+	
+/*calculate the standard error for storage*/
+DATA Estimate;
+SET TotalDiffs;
+SE = SQRT((&SIZE. - 1) / &SIZE. * tot);
+KEEP SE;
+RUN;
+ 	
+%MEND;
+
+OPTIONS NONOTES;
+
+/* Calling function */
+%jackKnife(WORK.SEALS, Lengths)
+
+%MACRO SE(Datafile, X);
+
+PROC MEANS DATA = &Datafile STDERR;
+VAR &X;
+output out = StandardEstimate stderr=SE;
+RUN;
+
+DATA StandardEstimate;
+SET StandardEstimate;
+KEEP SE;
+RUN;
+
+%MEND;
+
+/* Calling function */
+%SE(WORK.SEALS, Lengths)
+
+%MACRO loopjack(N);
+%do i=1 %to &N;
+%Jackknife(WORK.SEALS, Lengths);
+%end;
+%mend;
+
+%MACRO loopSE(N);
+%do i=1 %to &N;
+%SE(WORK.SEALS, Lengths);
+%end;
+%mend;
+
+
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
+
+/* Calling function many times for robust estimate */
+%loopSE(20);
+RUN;
+ 	
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
+
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
+
+/* Calling function many times for robust estimate */
+%loopjack(20);
+RUN;
+ 	
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
+```
+ 	
+ 	
