@@ -1,7 +1,6 @@
 /* MT5763 Group Project */
 /* code for doing jackknife estimation */
 
-%web_drop_table(WORK.SEALS);
 FILENAME REFILE '/folders/myfolders/sasuser.v94/seals.csv';
 
 PROC IMPORT DATAFILE=REFFILE
@@ -13,7 +12,6 @@ RUN;
 PROC CONTENTS DATA=WORK.SEALS;
 RUN;
 
-%web_open_table(WORK.SEALS);
 
 /*Jackknife Function
 	INPUTS
@@ -25,14 +23,14 @@ RUN;
 %MACRO jackKnife(Datafile, X);
 
 /*command for extracting the sample mean*/
-PROC UNIVARIATE DATA=Vec noprint; 
+PROC UNIVARIATE DATA=&DataFile noprint; 
 VAR &X;
 OUTPUT out=MEANX mean=sampmean;
 RUN;
 
 /*need to acquire size of the dataset (n) to know how many replicates will be needed*/
 PROC SQL NOPRINT;
-SELECT count(*) into :size from Vec;
+SELECT count(*) into :size from &DataFile;
 QUIT;
     
 /*obtain a dataset which is the sample mean repeated n times for later calculation*/
@@ -41,7 +39,7 @@ method=srs samprate=1 rep=&SIZE. ;
 RUN;
 	
 /*obtain n replications of the original data set*/
-PROC SURVEYSELECT DATA=Vec OUT=VecLong
+PROC SURVEYSELECT DATA=&DataFile OUT=VecLong
 method=srs samprate=1 rep=&SIZE. ;
 RUN;
 
@@ -82,11 +80,58 @@ RUN;
 
 OPTIONS NONOTES;
 
+/* Calling function */
+%jackKnife(WORK.SEALS, Lengths)
+
+%MACRO SE(Datafile, X);
+
+PROC MEANS DATA = &Datafile STDERR;
+VAR &X;
+output out = StandardEstimate stderr=SE;
+RUN;
+
+DATA StandardEstimate;
+SET StandardEstimate;
+KEEP SE;
+RUN;
+
+%MEND;
+
+/* Calling function */
+%SE(WORK.SEALS, Lengths)
+
+%MACRO loopjack(N);
+%do i=1 %to &N;
+%Jackknife(WORK.SEALS, Lengths);
+%end;
+%mend;
+
+%MACRO loopSE(N);
+%do i=1 %to &N;
+%SE(WORK.SEALS, Lengths);
+%end;
+%mend;
+
+
 /* Start the times, to count the function */
 %let _timer_start = %sysfunc(datetime());
 
-/* Calling function */
-%jackKnife(WORK.SEALS, Lengths)
+/* Calling function many times for robust estimate */
+%loopSE(20);
+RUN;
+ 	
+/* Stop timer, obtain time taken to execute program */
+data _null_;
+  dur = datetime() - &_timer_start;
+  put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
+run;
+
+/* Start the times, to count the function */
+%let _timer_start = %sysfunc(datetime());
+
+/* Calling function many times for robust estimate */
+%loopjack(20);
+RUN;
  	
 /* Stop timer, obtain time taken to execute program */
 data _null_;
