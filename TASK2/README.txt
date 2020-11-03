@@ -4,10 +4,6 @@
 
 Macro for estimating standard error of a variable from jackknifing, applied to seal dataset. 
 
-Calculated SE of Mean Seal Length: 0.5537712468cm
-
-Includes timer for length of the jackknife, times ranging from 0.5-3s in testing.
-
 Pseudocode for Macro Process
 
 [1] Extract the sample mean and obtain a dataset with it repeated n times
@@ -18,4 +14,9 @@ Pseudocode for Macro Process
 [6] Merge these n means with the sample mean repeated n times
 [7] Extract the squared difference between each mean and the sample mean
 [8] Sum the squared differences, apply required transformations, and store SE
+
+| Method     | Average Time Taken, s (n=20) | SE Estimate, cm |
+|------------|------------------------------|-----------------|
+| Analytical |                0.096         |   0.5537712468  |
+| Jackknife  |                0.308         |   0.5537712468  |
 
