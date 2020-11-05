@@ -56,11 +56,11 @@ for (i in seq(NRepeat)) {
 # create data frame for ggplot
 matchProb <- data.frame(p = probs, matches =totalMatches)
 
-ggplot(matchProb, aes(x = p, y = matches)) +
+ggplot(matchProb, aes(x = p, y = matches)) +     # plot total matches against probability
   geom_point() +
   xlab("Probability") +
   ylab("Total Number of Matches") +
-  geom_smooth() +
+  geom_smooth(se = FALSE) +
   scale_x_continuous(breaks = seq(0,1,0.1)) +
   scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches))) 
 
@@ -70,5 +70,28 @@ ggplot(matchProb, aes(x = p, y = matches)) +
 # (i.e. if a team obtains 2 wins - 3 losses, the maximum likelihood 
 # point estimate for their win rate is 40%). Specifically, focus on the
 # effect driven by the format of this tournament.
+
+winRate <- data.frame(p = probs, wins = totalWins)
+
+ggplot(winRate, aes(x = p, y = wins)) +     # plot total matches against probability
+  geom_point() +
+  xlab("Probability") +
+  ylab("Number of Wins") +
+  geom_smooth(se = FALSE) +
+  geom_abline(aes(intercept = 0, slope = 7)) +
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  scale_y_continuous(breaks = seq(min(winRate$wins), max(winRate$wins))) 
+
+
+winRate <- data.frame(p = probs, wins = totalWins, losses = totalLosses, rate = totalWins/(totalMatches))
+
+ggplot(winRate, aes(x = p, y = rate)) +     # plot total matches against probability
+  geom_point() +
+  xlab("Probability") +
+  ylab("Win rate") +
+  geom_smooth(se = FALSE) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  scale_y_continuous(breaks = seq(0,1,0.1))
 
 
