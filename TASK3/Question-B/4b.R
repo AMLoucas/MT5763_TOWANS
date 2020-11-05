@@ -1,17 +1,20 @@
 # Problem 4b
+library(tidyverse)
 
 # tournament format: a team keeps playing until they accrue 
 # 7 wins or 3 losses (whichever comes first - no draws allowed). 
 # Assume a fixed win rate p ∈ [0, 1] across all rounds
 # (they are paired at random).
 
+# Base tournament set up with repeats and data store
 # Initialisation
-NRepeat <- 10000 
-totalWins <- rep(NA, NRepeat)
-totalLosses <- rep(NA, NRepeat)
-totalMatches <- rep(NA, NRepeat)
-probs <- rep(NA, NRepeat)
+NRepeat <- 10000                    # number of replicates
+totalWins <- rep(NA, NRepeat)       # win store
+totalLosses <- rep(NA, NRepeat)     # loss store
+totalMatches <- rep(NA, NRepeat)    # matches store
+probs <- rep(NA, NRepeat)           # probability store
 
+# run tournament
 set.seed(231215)
 
 for (i in seq(NRepeat)) {
@@ -39,22 +42,27 @@ for (i in seq(NRepeat)) {
       nMatches <- nWins + nLosses            # find number of matches
   }
   
-  totalLosses[i] <- nLosses
-  totalWins[i] <- nWins
+  totalLosses[i] <- nLosses              # record wins, losses, matches and probabilities
+  totalWins[i] <- nWins                  
   totalMatches[i] <- nMatches
   probs[i] <- p
   
 
 }
 
-
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
 
+# create data frame for ggplot
+matchProb <- data.frame(p = probs, matches =totalMatches)
 
-
-
-
+ggplot(matchProb, aes(x = p, y = matches)) +
+  geom_point() +
+  xlab("Probability") +
+  ylab("Total Number of Matches") +
+  geom_smooth() +
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches))) 
 
 
 
