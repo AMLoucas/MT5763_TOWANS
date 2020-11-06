@@ -8,41 +8,47 @@ library(tidyverse)
 
 # Base tournament set up with repeats and data store
 # Initialisation
-NRepeat <- 10000                    # number of replicates
-totalWins <- rep(NA, NRepeat)       # win store
-totalLosses <- rep(NA, NRepeat)     # loss store
-totalMatches <- rep(NA, NRepeat)    # matches store
-probs <- rep(NA, NRepeat)           # probability store
 
-# run tournament
-set.seed(231215)
-
-for (i in seq(NRepeat)) {
-  nWins <- 0                   # set win counter
-  nLosses <- 0                 # set loss counter
-  p <- runif(1, min = 0, max = 1)    # calculate fixed probability
-
-  while(nLosses < 3 & nWins < 7) {      # set stopping condition
-      result <- rbinom(n = 1, size = 1, prob = p)   # simulate game result
-     
-      if (result == 0) {  # 0 - loss
-        nLosses <- nLosses + 1
-      }
-      
-      if (result == 1) { # 1 - win
-        nWins <- nWins + 1
-      }
-      
-      nMatches <- nWins + nLosses            # find number of matches
-  }
+tournament <- function(p) {
+  NRepeat <- 10000                    # number of replicates
+  totalWins <- rep(NA, NRepeat)       # win store
+  totalLosses <- rep(NA, NRepeat)     # loss store
+  totalMatches <- rep(NA, NRepeat)    # matches store
+  probs <- rep(NA, NRepeat)           # probability store
   
-  totalLosses[i] <- nLosses              # record wins, losses, matches and probabilities
-  totalWins[i] <- nWins                  
-  totalMatches[i] <- nMatches
-  probs[i] <- p
-
+  # run tournament
+  set.seed(231215)
+  
+  for (i in seq(NRepeat)) {
+    nWins <- 0                   # set win counter
+    nLosses <- 0                 # set loss counter
+   # p <- runif(1, min = 0, max = 1)    # calculate fixed probability
+  
+    while(nLosses < 3 & nWins < 7) {      # set stopping condition
+        result <- rbinom(n = 1, size = 1, prob = p)   # simulate game result
+       
+        if (result == 0) {  # 0 - loss
+          nLosses <- nLosses + 1
+        }
+        
+        if (result == 1) { # 1 - win
+          nWins <- nWins + 1
+        }
+        
+        nMatches <- nWins + nLosses            # find number of matches
+    }
+    
+    totalLosses[i] <- nLosses              # record wins, losses, matches and probabilities
+    totalWins[i] <- nWins                  
+    totalMatches[i] <- nMatches
+    probs[i] <- p
+  
+  }
+  return(list(losses = totalLosses,
+              matches = totalMatches,
+              wins = totalWins, 
+              p = probs))
 }
-
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
 
@@ -50,42 +56,14 @@ for (i in seq(NRepeat)) {
 avgMatches <- rep(NA, 100) # average matches store
 avgWinRate <- rep(NA, 100) # average matches store
 pseq <- seq(0,1,0.01) # probability sequence
+
 # run tournament
-set.seed(231220)
 for (p in pseq){
-  NRepeat <- 10000                    # number of replicates
-  totalWins <- rep(NA, NRepeat)       # win store
-  totalLosses <- rep(NA, NRepeat)     # loss store
-  totalMatches <- rep(NA, NRepeat)    # matches store
-  probs <- rep(NA, NRepeat)           # probability store
-  
-  for (i in seq(NRepeat)) {
-    nWins <- 0                   # set win counter
-    nLosses <- 0                 # set loss counter
-    
-    while(nLosses < 3 & nWins < 7) {      # set stopping condition
-      result <- rbinom(n = 1, size = 1, prob = p)   # simulate game result
-      
-      if (result == 0) {  # 0 - loss
-        nLosses <- nLosses + 1
-      }
-      
-      if (result == 1) { # 1 - win
-        nWins <- nWins + 1
-      }
-      nMatches <- nWins + nLosses            # find number of matches
-    }
-    
-    totalMatches[i] <- nMatches
-    totalLosses[i] <- nLosses              # record wins, losses, matches and matches
-    totalWins[i] <- nWins                  
-  
-    
-  }
-  avgMatches[which(pseq == p)] <- mean(totalMatches)
-  avgWinRate[which(pseq == p)] <- mean(totalWins/totalMatches)
+  test <- tournament(p)
+  avgMatches[which(pseq == p)] <- mean(test$matches)
+  avgWinRate[which(pseq == p)] <- mean(test$wins/test$matches)
 }  
-  
+
 # create data frame for ggplot
 matchProb <- data.frame(p = pseq, matches = avgMatches, rate = avgWinRate)
 
@@ -126,4 +104,6 @@ ggplot(matchProb, aes(x = p, y = abs(rate-p))) +     # plot win rate against pro
 
 
 
+library(parallel)
 
+detectCores()
