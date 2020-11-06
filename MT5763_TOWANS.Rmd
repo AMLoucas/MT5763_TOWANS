@@ -136,17 +136,33 @@ PROC UNIVARIATE
 	OUTPUT out=WORK.SlopeCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
 RUN;
 ```
-We now obtained the 95% confidence interval for the parameter estimators on Intercept and slope of length. \
+We now obtained the 95% confidence interval for the parameter estimators on Intercept and slope of length from regBoot and regBootUpdated.. \
+
+**regBootUpdated** \
 
 | CI    | RandomSlope | RandomIntercept |
-|:----: |:----------:	|:--------------:	|
-| 2.5%  | 1.8329137 	|   75.015581   	|
-| 97.5% | 2.2245273 	|   118.81835  	  |
+|:----: |:-----------:|:---------------:|
+| 2.5%  |   1.845   	|     74.942     	|
+| 97.5% |   2.228   	|    117.238   	  |
+
+**regBoot** \
+
+| CI    | RandomSlope | RandomIntercept |
+|:----: |:----------:	|:---------------:|
+| 2.5%  |   1.869   	|     79.696     	|
+| 97.5% |   2.189   	|    114.162   	  |
+
+We also fitted a model on the provided data and obtained the estimate values. \
+
+| Intecept | 96.153 | 
+|:-------: |:------:|
+|  Slope   | 2.036  |    
+
 
  \
 We also plotted the parameter estimates in histograms to visualize the distribution. \
 
-```{eval=FALSE, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
 # All defaults
 include_graphics("TASK1/Intercept-estimate.png")
 include_graphics("TASK1/Sope-Intercept.png")
