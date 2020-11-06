@@ -22,7 +22,6 @@ tournament <- function(p) {
   for (i in seq(NRepeat)) {
     nWins <- 0                   # set win counter
     nLosses <- 0                 # set loss counter
-   # p <- runif(1, min = 0, max = 1)    # calculate fixed probability
   
     while(nLosses < 3 & nWins < 7) {      # set stopping condition
         result <- rbinom(n = 1, size = 1, prob = p)   # simulate game result
@@ -49,20 +48,50 @@ tournament <- function(p) {
               wins = totalWins, 
               p = probs))
 }
+
+# for fixed p:
+tournament(runif(1, min = 0, max = 1))
+
+
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
+
+library(doParallel)
+library(parallel)
+
+detectCores()
 
 # Initialisation
 avgMatches <- rep(NA, 100) # average matches store
 avgWinRate <- rep(NA, 100) # average matches store
-pseq <- seq(0,1,0.01) # probability sequence
 
+
+pseq <- seq(0,1,0.01) # probability sequence
+nCores <- 8 # no. of cores
+cl <- makeCluster(spec = nCores, type = "PSOCK")
+registerDoParallel(cl)
+
+start <- Sys.time()
+  avgMatches <-  foreach(p = pseq, .combine = "c") %dopar% {  
+              test <- tournament(p)
+               mean(test$matches)}
+  
+  avgWinRate <-  foreach(p = pseq, .combine = "c") %dopar% {  
+              test <- tournament(p)
+              mean(test$wins/test$matches)}
+stopCluster(cl)
+
+end <- Sys.time()
+end-start
 # run tournament
+start <- Sys.time()
 for (p in pseq){
   test <- tournament(p)
   avgMatches[which(pseq == p)] <- mean(test$matches)
   avgWinRate[which(pseq == p)] <- mean(test$wins/test$matches)
 }  
+end <- Sys.time()
+end-start
 
 # create data frame for ggplot
 matchProb <- data.frame(p = pseq, matches = avgMatches, rate = avgWinRate)
@@ -103,7 +132,3 @@ ggplot(matchProb, aes(x = p, y = abs(rate-p))) +     # plot win rate against pro
 
 
 
-
-library(parallel)
-
-detectCores()
