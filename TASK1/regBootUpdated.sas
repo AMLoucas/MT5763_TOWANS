@@ -24,7 +24,7 @@ RUN;
 /* Bootstrap loop for simulating data */
 PROC SURVEYSELECT 
 	data=&DataFile
-	out=WORK.bootData seed=23434
+	out=WORK.bootData seed=-23434
 	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
 	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
 	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
@@ -60,7 +60,7 @@ OPTIONS NONOTES;
 %let _timer_start = %sysfunc(datetime());
 
 /* Calling function */
-%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 5000);
+%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 1000);
 
 /* Stop timer, obtain time taken to execute program */
 data _null_;
@@ -93,4 +93,6 @@ PROC SGPLOT data = WORK.ESTIMATES;
 	HISTOGRAM RandomSlope;
 RUN;
 TITLE;
+
+
 
