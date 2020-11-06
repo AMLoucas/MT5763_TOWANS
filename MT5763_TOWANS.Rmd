@@ -37,7 +37,7 @@ library(knitr)
  * **We did not manually compute the number of rows of the original dataset.** \
 
 When applying the simulation, we want our sample data to have the same number rows as the original dataset. In the provided code the number of rows are obtained using code: \
-```
+```{eval=FALSE}
 /*Number of rows in my dataset*/
  	data _null_;
   	set &DataSet NOBS=size;
@@ -46,7 +46,7 @@ When applying the simulation, we want our sample data to have the same number ro
  	run;
 ```
 In the updated version, we do not use this approach. The in-built SAS function surveyselect supplies a field/method that automatically computes the number of rows of the dataset you are applying re-sampling. The method name is "SAMPRATE = ?? ". By assigning this field with the value 1 or 100, the number of rows will be computed for you. \
-```
+```{eval=FALSE}
 PROC SURVEYSELECT 
 	data=&DataFile
 	out=WORK.bootData seed=23434
@@ -61,7 +61,7 @@ RUN;
   * **We did not use a loop to accomplish our N re-sampling simulations.** \
 
 In the code provided the different simulation of bootstrapping is computed with a "for loop" . This was not a good approach, because the algorithm would obtain the re-sampled data and apply computations on it. This would be repeated for our N number of simulations. A more efficient approach is to compute all the bootstrap simulations in advance and apply the computation on the datasets at once. We computed all our N bootstrap simulations using a field/method from the in-built SAS function surveyselect. The name of the field/method is "rep = ?? ", we assigned "rep" with the number of bootstrap re-sampling datasets we want to construct. \
-```
+```{eval=FALSE}
 /* Bootstrap loop for simulating data */
 PROC SURVEYSELECT 
 	data=&DataFile
@@ -77,7 +77,7 @@ RUN;
  * **We did not fit the linear model 1-by-1 for each sample dataset.** \
 
 Because we used "rep", the sample datasets constructed were supplied with an extra column called "REPLICATE". This field holds an integer value that indicates in which re-sampling iteration the row/data belongs to. We could than apply a model for each re-sampled dataset at once, with no need to iterate through each dataset and fit a model 1-by-1. This was accomplished by the command line "BY REPLICATE". This would automatically divide the datasets with the replicate value and fit the regression model using each iterations values. \
-```
+```{eval=FALSE}
 /* Create model for each loop/simulation */
 PROC REG data=WORK.bootData 
 	outest=WORK.ESTIMATES  noprint;
@@ -93,7 +93,7 @@ QUIT;
  * **We did not append our estimates results 1-by-1 for each iteration.** \
  
 Since we used the "BY REPLICATE" command line, we had all our model results in one table at once.We extracted a subset from the fitted models result table that we were interested in one command line. We did not need to pull our fields of interest for each iteration and append it in a different table. \
-```
+```{eval=FALSE}
 /*Extract just the columns for slope and intercept for storage */
 DATA WORK.ESTIMATES;
 	SET WORK.ESTIMATES;
@@ -122,7 +122,7 @@ is indeed more efficient. The times have a huge different, for the large values 
 Another feature we can notice from the time table is, as N increases the time taken to execute is also rapidly increased. While on the other hand the modified version does not increase on a high scale, but shows small signs of increased times. \
  \
 In addition to making the algorithm more efficient, we had to compute the 95% Confidence intervals for the parameter estimates of interest. These values can be computed using the SAS in-built function of UNIVARIATE. \
-```
+```{eval=FALSE}
 /* GET THE 95% CI of our estimates*/
 PROC UNIVARIATE 
 	data=WORK.ESTIMATES;
@@ -146,7 +146,7 @@ We now obtained the 95% confidence interval for the parameter estimators on Inte
  \
 We also plotted the parameter estimates in histograms to visualize the distribution. \
 
-```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+```{eval=FALSE, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
 # All defaults
 include_graphics("TASK1/Intercept-estimate.png")
 include_graphics("TASK1/Sope-Intercept.png")
@@ -344,9 +344,9 @@ As we can see here our Jackknife process is slightly less efficient than calcula
 <!-- Full code snippets of the tasks -->
 
 
-#### UPDATED CODE FOR TASK [2] BOOTSTRAP
+#### regBootUpdated CODE FOR TASK [2] BOOTSTRAP
 
-```
+```{eval=FALSE}
 /* MT5763 GROUP PROJECT */
 /* Updated bootstrap code to be faster */
 FILENAME REFFILE '/folders/myfolders/sasuser.v94/GROUP-BootStrap/seals.csv';
@@ -373,7 +373,7 @@ RUN;
 /* Bootstrap loop for simulating data */
 PROC SURVEYSELECT 
 	data=&DataFile
-	out=WORK.bootData seed=23434
+	out=WORK.bootData seed=-23434
 	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
 	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
 	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
@@ -409,13 +409,40 @@ OPTIONS NONOTES;
 %let _timer_start = %sysfunc(datetime());
 
 /* Calling function */
-%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 5000);
+%bootStrap(DataFile = WORK.SEALS_UPDATED, X = Lengths, Y = Testosterone, SampleSet = 1000);
 
 /* Stop timer, obtain time taken to execute program */
 data _null_;
   dur = datetime() - &_timer_start;
   put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
 run;
+
+/* GET THE 95% CI of our estimates*/
+PROC UNIVARIATE 
+	data=WORK.ESTIMATES;
+	VAR RandomIntercept;
+	OUTPUT out=WORK.InterceptCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
+RUN;
+
+PROC UNIVARIATE 
+	data=WORK.ESTIMATES;
+	VAR RandomSlope;
+	OUTPUT out=WORK.SlopeCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
+RUN;
+
+/* WE PLOT ESTIMATES TO VIEW THE CI */  
+PROC SGPLOT data = WORK.ESTIMATES;
+	TITLE "HISTOGRAM OF THE RANDOM INTERCEPT";
+	HISTOGRAM RandomIntercept;
+RUN;
+TITLE;
+
+PROC SGPLOT data = WORK.ESTIMATES;
+	TITLE "HISTOGRAM OF THE RANDOM SLOPE (LENGTH)";
+	HISTOGRAM RandomSlope;
+RUN;
+TITLE;
+
 ```
 
 #### CODE FOR TASK [3] Jackknifing
