@@ -32,6 +32,17 @@ Link to Shiny App:https://janforschner.shinyapps.io/mt5763_shiny/
 
 For the Shiny question in this project, we have created a **US Stock Analyser** app. This app gives a live overview of the stock market data for more than 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant market news. The app uses data from the free version of the Finnhub.io API.
 
+### Functionality
+The US Stock Analyser Shiny app uses relevant user inputs and API data to relevant display stock and company data.
+
+On the **server** side, *eventReactive* functions are used to access, load and manipulate relevant API data, before putting it into appropriate data frames. The reactive functions are designed such that they only re-run the code, if one of the corresponding inputs is modified or the data is refreshed (either using the Refresh button or the 1 hour refresh timer). We have also added relevant error messages for invalid inputs and missing data. In addition, the server includes the different outputs including Plotly plots (allowing for user interaction), HTML output for text displayed in the app, outputs for the value boxes and the download button functionality.
+
+In the **UI** document, we have included the inputs and UI elements as well as the main body output elements of the app. We have decided to use the dashboard layout (as opposed to the original layout), as this displays of the data in a more effective way and also results in a better design. The sidebar includes relevant user inputs, the refresh and download button as well as help text for the data input. The main dashboard itself uses value boxes, normal dashboard boxes and tabb boxes to display the different graphs and data output.
+
+Finally, we have made use of the **global.R** document to make the server code cleaner and more concise. This file is responsible for loading all required packages, as well as defining functions for data wrangling and error messages that are used in the server file. The app also includes a **Readme.md** file as well as a **DESCRIPTION** file. The Readme.md file provides a brief description and instructions for using the app, while the DESCRIPTION file gives app details and allows for the app to be launched in Showcase Mode.
+
+### Using the Shiny app
+
 
 
 
