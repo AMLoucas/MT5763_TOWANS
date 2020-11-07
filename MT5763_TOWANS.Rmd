@@ -27,6 +27,11 @@ library(knitr)
 
 ## TASK-1 [Shiny app (R)]
 
+Link to Shiny GitHub repository: https://github.com/janfor1/MT5763_Shiny.git
+Link to Shiny App:https://janforschner.shinyapps.io/mt5763_shiny/
+
+For the Shiny question in this project, we have created a **US Stock Analyser** app. This app gives a live overview of the stock market data for more than 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant market news. The app uses data from the free version of the Finnhub.io API.
+
 
 
 
