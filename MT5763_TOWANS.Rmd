@@ -27,9 +27,8 @@ library(knitr)
 
 ## TASK-1 [Shiny app (R)]
 
-Link to Shiny GitHub repository: https://github.com/janfor1/MT5763_Shiny.git
-
-Link to Shiny App:https://janforschner.shinyapps.io/mt5763_shiny/
+**Link to Shiny GitHub repository:** https://github.com/janfor1/MT5763_Shiny.git \
+**Link to Shiny App:** https://janforschner.shinyapps.io/mt5763_shiny/
 
 For the Shiny question in this project, we have created a **US Stock Analyser** app. This app gives a live overview of the stock market data for more than 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant market news. The app uses data from the free version of the Finnhub.io API.
 
@@ -48,7 +47,7 @@ The user can interact with the Shiny app in a variety of ways. The available dat
 
 #### Sidebar
 
-```{r, echo=FALSE, fig.align='center',  out.width="80%", out.height="80%"}
+```{r, echo=FALSE, fig.align='center',  out.width="95%", out.height="95%"}
 knitr::include_graphics("Shiny_Screenshots/Navbar.png")
 ```
 
@@ -69,7 +68,7 @@ There are restrictions on the date range and resolutions that are explained in t
 
 The US Stock Analyser dashboard is the section of the app, where all relevant data is displayed. The individual outputs are explained here.
 
-```{r, echo=FALSE, fig.align='center',  out.width="80%", out.height="80%"}
+```{r, echo=FALSE, fig.align='center',  out.width="95%", out.height="95%"}
 knitr::include_graphics("Shiny_Screenshots/DashboardP1.png")
 ```
 
@@ -80,7 +79,7 @@ knitr::include_graphics("Shiny_Screenshots/DashboardP1.png")
 5. **Time-Series Tab:** Shows an interactive time-series graph for the selected stock, date range and resolution. Again hovering over the line will indicate the stock price at the different time intervals.
 6. **Analysis Tab:** If available, this provides an interactive bar chart of the analyst recommendations (stong sell, sell, hold, buy or stock buy) for the selected stock over the past 6 months. Hovering over the chart will give details for the individual months.
 
-```{r, echo=FALSE, fig.align='center',  out.width="80%", out.height="80%"}
+```{r, echo=FALSE, fig.align='center',  out.width="95%", out.height="95%"}
 knitr::include_graphics("Shiny_Screenshots/DashboardP2.png")
 ```
 
