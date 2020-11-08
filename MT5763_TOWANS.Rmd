@@ -44,11 +44,11 @@ Finally, we have made use of the **global.R** document to make the server code c
 
 ### Using the Shiny app
 
-The user can interact with the Shiny app in a variety of ways.
+The user can interact with the Shiny app in a variety of ways. The available data inputs as well as the outputs shown on the dashboard are explained in details below.
 
 #### Sidebar
 
-```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+```{r, echo=FALSE, fig.align='center',  out.width="80%", out.height="80%"}
 knitr::include_graphics("Shiny_Screenshots/Navbar.png")
 ```
 
@@ -69,7 +69,7 @@ There are restrictions on the date range and resolutions that are explained in t
 
 The US Stock Analyser dashboard is the section of the app, where all relevant data is displayed. The individual outputs are explained here.
 
-```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+```{r, echo=FALSE, fig.align='center',  out.width="80%", out.height="80%"}
 knitr::include_graphics("Shiny_Screenshots/DashboardP1.png")
 ```
 
@@ -80,7 +80,7 @@ knitr::include_graphics("Shiny_Screenshots/DashboardP1.png")
 5. **Time-Series Tab:** Shows an interactive time-series graph for the selected stock, date range and resolution. Again hovering over the line will indicate the stock price at the different time intervals.
 6. **Analysis Tab:** If available, this provides an interactive bar chart of the analyst recommendations (stong sell, sell, hold, buy or stock buy) for the selected stock over the past 6 months. Hovering over the chart will give details for the individual months.
 
-```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+```{r, echo=FALSE, fig.align='center',  out.width="80%", out.height="80%"}
 knitr::include_graphics("Shiny_Screenshots/DashboardP2.png")
 ```
 
