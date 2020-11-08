@@ -33,9 +33,9 @@ Link to Shiny App:https://janforschner.shinyapps.io/mt5763_shiny/
 For the Shiny question in this project, we have created a **US Stock Analyser** app. This app gives a live overview of the stock market data for more than 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant market news. The app uses data from the free version of the Finnhub.io API.
 
 ### Functionality
-The US Stock Analyser Shiny app uses relevant user inputs and API data to relevant display stock and company data.
+The US Stock Analyser Shiny app uses relevant user inputs and API data to display corresponding stock and company data.
 
-On the **server** side, *eventReactive* functions are used to access, load and manipulate relevant API data, before putting it into appropriate data frames. The reactive functions are designed such that they only re-run the code, if one of the corresponding inputs is modified or the data is refreshed (either using the Refresh button or the 1 hour refresh timer). We have also added relevant error messages for invalid inputs and missing data. In addition, the server includes the different outputs including Plotly plots (allowing for user interaction), HTML output for text displayed in the app, outputs for the value boxes and the download button functionality.
+On the **server** side, *eventReactive* functions are used to access, load and manipulate relevant API data, before putting it into appropriate data frames. The reactive functions are designed such that they only re-run the code, if one of the corresponding inputs is modified or the data is refreshed (either using the Refresh button or the 1 hour refresh timer). We have also added relevant error messages for invalid inputs and missing data. In addition, the server includes the different *outputs* including Plotly plots (allowing for user interaction), HTML output for text displayed in the app, outputs for the value boxes and the download button functionality.
 
 In the **UI** document, we have included the inputs and UI elements as well as the main body output elements of the app. We have decided to use the dashboard layout (as opposed to the original layout), as this displays of the data in a more effective way and also results in a better design. The sidebar includes relevant user inputs, the refresh and download button as well as help text for the data input. The main dashboard itself uses value boxes, normal dashboard boxes and tabb boxes to display the different graphs and data output.
 
@@ -43,8 +43,22 @@ Finally, we have made use of the **global.R** document to make the server code c
 
 ### Using the Shiny app
 
+The user can interact with the Shiny app in a variety of ways. Key to the user experience is the navigation bar shown below.
 
+```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+knitr::include_graphics("Shiny_Screenshots/Navbar.png")
+```
 
+The navigation bar is located on the left of the app dashboard and includes several data inputs and buttons as explained below.
+
+1. **Stock Name:** Stock name/ticker input field that accepts compatible US letter stock codes (such as AAPL, AMZN, GOOGL, etc.). The field shows suggestions for the 8000+ supported stocks as the user types and ensures only compatible names are entered.
+2. **Search Button:** The search button is used to confirm the stock selection on the *Stock Name* field and load the relevant data.
+3. **NASDAQ Stock Names:** This button opens a list of NASDAQ listed companies with their respective stock names in a new tab.
+4. **Stock Date Range:** The date range selector allows the x-axis (date/time) limits for the Candlestick plot and the Time-Series plot to be selected.
+5. **Resolution:** Here the user can select the resolution for the Candlestick plot and the Time-Series plot (i.e. the time intervals for which the financial data is downloaded and shown), ranging from 1 minute to 1 month. The note below the input field, details the limitations for certain time frames and resolutions.
+6. **Refresh Button:** Users can press the refresh button to manually update all stock data and reload the relevant output. In addition, there is a 1 hour refresh timer, that automatically refreshes the data every hour.
+7. **Last Updated Info:** The text below the *Refresh Button* indicates the last time that stock data has been updated.
+8. **Download Stock Data Button:** Pressing this button will download stock data (time/date, open, close, low, high) as a csv file for the currently selected stock, date range and resolution.
 
 ## TASK-2 [Bootstrap (SAS)]
 
