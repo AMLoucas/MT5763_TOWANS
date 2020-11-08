@@ -28,6 +28,7 @@ library(knitr)
 ## TASK-1 [Shiny app (R)]
 
 Link to Shiny GitHub repository: https://github.com/janfor1/MT5763_Shiny.git
+
 Link to Shiny App:https://janforschner.shinyapps.io/mt5763_shiny/
 
 For the Shiny question in this project, we have created a **US Stock Analyser** app. This app gives a live overview of the stock market data for more than 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant market news. The app uses data from the free version of the Finnhub.io API.
@@ -43,15 +44,15 @@ Finally, we have made use of the **global.R** document to make the server code c
 
 ### Using the Shiny app
 
-The user can interact with the Shiny app in a variety of ways. Key to the user experience is the navigation bar shown below.
+The user can interact with the Shiny app in a variety of ways.
 
-#### Navigation Bar
+#### Sidebar
 
 ```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
 knitr::include_graphics("Shiny_Screenshots/Navbar.png")
 ```
 
-The navigation bar is located on the left of the app dashboard and includes several data inputs and buttons as explained below. It can also be hidden by pressing the button (3 horizontal white lines) next to the app name.
+The sidebar is located on the left of the app dashboard and includes several data inputs and buttons as explained below. It can also be hidden by pressing the button (3 horizontal white lines) next to the app name.
 
 1. **Stock Name:** Stock name/ticker input field that accepts compatible US letter stock codes (such as AAPL, AMZN, GOOGL, etc.). The field shows suggestions for the 8000+ supported stocks as the user types and ensures only compatible names are entered.
 2. **Search Button:** The search button is used to confirm the stock selection on the *Stock Name* field and load the relevant data.
@@ -61,6 +62,8 @@ The navigation bar is located on the left of the app dashboard and includes seve
 6. **Refresh Button:** Users can press the refresh button to manually update all stock data and reload the relevant output. In addition, there is a 1 hour refresh timer, that automatically refreshes the data every hour.
 7. **Last Updated Info:** The text below the *Refresh Button* indicates the last time that stock data has been updated.
 8. **Download Stock Data Button:** Pressing this button will download stock data (time/date, open, close, low, high) as a csv file for the currently selected stock, date range and resolution.
+
+There are restrictions on the date range and resolutions that are explained in the sidebar. In particular, resolutions smaller than 1 day are not available for 2019 and earlier and the date range for such graphs is limited to a maximum of 3 months. Also, it should be noted that the resolution must be smaller than the selected date range (i.e. if 1 day is selected a resolution of 1 month will return an error) and that the end date must be after the start date. If the input values are invalid or violate these rules, custom error messages will be shown informing the user.
 
 #### Dashboard
 
@@ -84,6 +87,8 @@ knitr::include_graphics("Shiny_Screenshots/DashboardP2.png")
 7. **Company Info:** This dashboard box provides company information for the selected stock including name, website, market cap, etc. If available, the company logo is also displayed.
 8. **Stock Price Target:** If available for the selected stock, this output provides the 12 month stock price targets predicted by analysts (high, low and mean) in USD.
 9. **Company News:** In this box, the 5 latest company news articles (but no older than 4 weeks) for the selected stock are displayed, with links to the relevant articles.
+
+Given API limitations, not all data shown will be available for all stocks. In particular, for stocks of very small companies the analyst recommendations, price targets, company info and/or company news may be unavailable. In this case custom relevant error messages are displayed.
 
 
 ## TASK-2 [Bootstrap (SAS)]
