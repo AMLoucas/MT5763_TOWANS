@@ -89,6 +89,10 @@ knitr::include_graphics("Shiny_Screenshots/DashboardP2.png")
 
 Given API limitations, not all data shown will be available for all stocks. In particular, for stocks of very small companies the analyst recommendations, price targets, company info and/or company news may be unavailable. In this case custom relevant error messages are displayed.
 
+### Summary
+
+The US Stock Analyser shiny app uses API data and user inputs (stock name, date range and resolution) to display current stock quotes, stock price charts, analyst predictions and recommendations as well as company data and news. The plot are interactive, allowing user to see details for individual data points. In addition, the app has a refresh (button and automatic hourly refresh) and download functionality. Relevant explanations and error messages help the user to select adequate inputs and interpret the displayed outputs.
+
 
 ## TASK-2 [Bootstrap (SAS)]
 
