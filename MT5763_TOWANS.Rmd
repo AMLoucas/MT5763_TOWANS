@@ -414,11 +414,24 @@ As we can see here our Jackknife process is slightly less efficient than calcula
 #### Problem-B 
 
 ## Conclusions
-<!-- We can talk in general our results, what we found difficult and not. How we worked as a team -->
-<!-- General for all exercises (Main result points)-->
+<!-- General explanation of project (and component tasks)-->
 
+### Collaboration & Using GitHub
+<!-- What we found difficult and not. How we worked as a team -->
 
+### Task Outcomes
 
+#### Shiny App (R)
+<!-- 2-3 sentences summarising findings and potential real world application-->
+#### Bootstrapping (SAS)
+<!-- 2-3 sentences summarising findings and potential real world application-->
+#### Jackknife (SAS)
+<!-- 2-3 sentences summarising findings and potential real world application-->
+#### Monte Carlo Simulations (R)
+<!-- 2-3 sentences summarising findings and potential real world application-->
+
+### Further Exploration
+<!-- very brief outline of how certain tasks could be investigated further/from a different perspective-->
 
 ## APPENDIX
 <!-- Full code snippets of the tasks -->
