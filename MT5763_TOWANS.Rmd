@@ -45,20 +45,46 @@ Finally, we have made use of the **global.R** document to make the server code c
 
 The user can interact with the Shiny app in a variety of ways. Key to the user experience is the navigation bar shown below.
 
+#### Navigation Bar
+
 ```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
 knitr::include_graphics("Shiny_Screenshots/Navbar.png")
 ```
 
-The navigation bar is located on the left of the app dashboard and includes several data inputs and buttons as explained below.
+The navigation bar is located on the left of the app dashboard and includes several data inputs and buttons as explained below. It can also be hidden by pressing the button (3 horizontal white lines) next to the app name.
 
 1. **Stock Name:** Stock name/ticker input field that accepts compatible US letter stock codes (such as AAPL, AMZN, GOOGL, etc.). The field shows suggestions for the 8000+ supported stocks as the user types and ensures only compatible names are entered.
 2. **Search Button:** The search button is used to confirm the stock selection on the *Stock Name* field and load the relevant data.
 3. **NASDAQ Stock Names:** This button opens a list of NASDAQ listed companies with their respective stock names in a new tab.
-4. **Stock Date Range:** The date range selector allows the x-axis (date/time) limits for the Candlestick plot and the Time-Series plot to be selected.
-5. **Resolution:** Here the user can select the resolution for the Candlestick plot and the Time-Series plot (i.e. the time intervals for which the financial data is downloaded and shown), ranging from 1 minute to 1 month. The note below the input field, details the limitations for certain time frames and resolutions.
+4. **Stock Date Range:** The date range selector allows the x-axis (date/time) limits for the candlestick plot and the Time-Series plot to be selected.
+5. **Resolution:** Here the user can select the resolution for the candlestick plot and the Time-Series plot (i.e. the time intervals for which the financial data is downloaded and shown), ranging from 1 minute to 1 month. The note below the input field, details the limitations for certain time frames and resolutions.
 6. **Refresh Button:** Users can press the refresh button to manually update all stock data and reload the relevant output. In addition, there is a 1 hour refresh timer, that automatically refreshes the data every hour.
 7. **Last Updated Info:** The text below the *Refresh Button* indicates the last time that stock data has been updated.
 8. **Download Stock Data Button:** Pressing this button will download stock data (time/date, open, close, low, high) as a csv file for the currently selected stock, date range and resolution.
+
+#### Dashboard
+
+The US Stock Analyser dashboard is the section of the app, where all relevant data is displayed. The individual outputs are explained here.
+
+```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+knitr::include_graphics("Shiny_Screenshots/DashboardP1.png")
+```
+
+1. **Current Price:** Displays the current stock price (at last update time/date) for the selected stock in USD.
+2. **Daily Low:** Shows the minimum stock price for the day in USD (or previous trading day in case of bank holidays or weekends).
+3. **Daily High:** Gives the maximum stock price for the day in USD (or previous trading day in case of bank holidays or weekends).
+4. **Candlestick Tab (default):** Displays an interactive candlestick chart for the chosen stock, date range and resolution. Hovering over individual data points will give relevant prices (open, close, high, low) for the given period. The slider controls underneath the x-axis can be used to manually adjust the date range shown.
+5. **Time-Series Tab:** Shows an interactive time-series graph for the selected stock, date range and resolution. Again hovering over the line will indicate the stock price at the different time intervals.
+6. **Analysis Tab:** If available, this provides an interactive bar chart of the analyst recommendations (stong sell, sell, hold, buy or stock buy) for the selected stock over the past 6 months. Hovering over the chart will give details for the individual months.
+
+```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%"}
+knitr::include_graphics("Shiny_Screenshots/DashboardP2.png")
+```
+
+7. **Company Info:** This dashboard box provides company information for the selected stock including name, website, market cap, etc. If available, the company logo is also displayed.
+8. **Stock Price Target:** If available for the selected stock, this output provides the 12 month stock price targets predicted by analysts (high, low and mean) in USD.
+9. **Company News:** In this box, the 5 latest company news articles (but no older than 4 weeks) for the selected stock are displayed, with links to the relevant articles.
+
 
 ## TASK-2 [Bootstrap (SAS)]
 
