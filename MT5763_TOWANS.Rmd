@@ -25,14 +25,14 @@ library(knitr)
   The data that was used in Task 2 & 3, is a fictional dataset of male hormone levels in seals of different lengths. \
 
 
-## TASK-1 [Shiny app (R)]
+## 1 Developing a Shiny App (R)
 
 **Link to Shiny GitHub repository:** https://github.com/janfor1/MT5763_Shiny.git \
 **Link to Shiny App:** https://janforschner.shinyapps.io/mt5763_shiny/
 
 For the Shiny question in this project, we have created a **US Stock Analyser** app. This app gives a live overview of the stock market data for more than 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant market news. The app uses data from the free version of the Finnhub.io API.
 
-### Functionality
+### 1.1 Functionality
 The US Stock Analyser Shiny app uses relevant user inputs and API data to display corresponding stock and company data.
 
 On the **server** side, *eventReactive* functions are used to access, load and manipulate relevant API data, before putting it into appropriate data frames. The reactive functions are designed such that they only re-run the code, if one of the corresponding inputs is modified or the data is refreshed (either using the Refresh button or the 1 hour refresh timer). We have also added relevant error messages for invalid inputs and missing data. In addition, the server includes the different *outputs* including Plotly plots (allowing for user interaction), HTML output for text displayed in the app, outputs for the value boxes and the download button functionality.
@@ -41,7 +41,7 @@ In the **UI** document, we have included the inputs and UI elements as well as t
 
 Finally, we have made use of the **global.R** document to make the server code cleaner and more concise. This file is responsible for loading all required packages, as well as defining functions for data wrangling and error messages that are used in the server file. The app also includes a **Readme.md** file as well as a **DESCRIPTION** file. The Readme.md file provides a brief description and instructions for using the app, while the DESCRIPTION file gives app details and allows for the app to be launched in Showcase Mode.
 
-### Using the Shiny app
+### 1.2 Using the Shiny app
 
 The user can interact with the Shiny app in a variety of ways. The available data inputs as well as the outputs shown on the dashboard are explained in details below.
 
@@ -89,7 +89,7 @@ knitr::include_graphics("Shiny_Screenshots/DashboardP2.png")
 
 Given API limitations, not all data shown will be available for all stocks. In particular, for stocks of very small companies the analyst recommendations, price targets, company info and/or company news may be unavailable. In this case custom relevant error messages are displayed.
 
-### Summary
+### 1.3 Summary
 
 The US Stock Analyser shiny app uses API data and user inputs (stock name, date range and resolution) to display current stock quotes, stock price charts, analyst predictions and recommendations as well as company data and news. The plot are interactive, allowing user to see details for individual data points. In addition, the app has a refresh (button and automatic hourly refresh) and download functionality. Relevant explanations and error messages help the user to select adequate inputs and interpret the displayed outputs.
 
