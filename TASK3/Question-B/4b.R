@@ -17,7 +17,6 @@ tournament <- function(p = runif(1, min = 0, max = 1)) {
   totalWins <- rep(NA, NRepeat)       # win store
   totalLosses <- rep(NA, NRepeat)     # loss store
   totalMatches <- rep(NA, NRepeat)    # matches store
-  probs <- rep(NA, NRepeat)           # probability store
   
   # run tournament
   set.seed(231215)             # reproducibility
@@ -43,13 +42,13 @@ tournament <- function(p = runif(1, min = 0, max = 1)) {
     totalLosses[i] <- nLosses              # record wins, losses, matches and probabilities
     totalWins[i] <- nWins                  
     totalMatches[i] <- nMatches
-    probs[i] <- p
   
   }
   return(list(losses = totalLosses,         
               matches = totalMatches,
               wins = totalWins, 
-              p = probs))
+              probability = p
+             ))
 }
 
 
