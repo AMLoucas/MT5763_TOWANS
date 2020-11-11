@@ -411,13 +411,15 @@ As we can see here our Jackknife process is slightly less efficient than calcula
 
 
 ## TASK-4 [Monte Carlo simulation (R)]
+The problems in task 4 involved writing efficient R code to solve two problems using Monte Carlo simulation.  Problem A explores distribution of random variables and Problem B explores the varying outcomes of a football tournament and the associated probabilities.
 
 #### Problem-A 
 
 
 
-
 #### Problem-B 
+
+### 4.2.1 
 
 ## Conclusion
 Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of different tournament formats in football.
