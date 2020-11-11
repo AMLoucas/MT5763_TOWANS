@@ -56,11 +56,6 @@ tournament <- function(p = runif(1, min = 0, max = 1), NRepeat = 1) {
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
 
-# Initialisation
-avgMatches <- rep(NA, 100) # average matches store
-avgWinRate <- rep(NA, 100) # average matches store
-
-
 pseq <- seq(0,1,0.01) # probability sequence
 
 
@@ -70,33 +65,32 @@ cl <- makeCluster(spec = nCores, type = "PSOCK")
 registerDoParallel(cl)
 
 start <- Sys.time()
-  avgMatches <-  foreach(p = pseq, .combine = "c") %dopar% {  
-              test <- tournament(p, 10000)
-               mean(test$matches)}
-  
-  avgWinRate <-  foreach(p = pseq, .combine = "c") %dopar% {  
-              test <- tournament(p, 10000)
-              mean(test$wins/test$matches)}
-stopCluster(cl)
-
+averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
+  sim <- tournament(p, 10000)
+  p <- p
+  matches <-(mean(sim$matches))
+  rate <- (mean(sim$wins/sim$matches))
+  data.frame(p, matches, rate)
+}
 end <- Sys.time()
 end-start
 
 # non parallelise 
 # run tournament
+
+averages <- data.frame(p = pseq, matches = rep(NA,101), rate = rep(NA,101))
+
 start <- Sys.time()
 for (p in pseq){
-  test <- tournament(p, 10000)
-  avgMatches[which(pseq == p)] <- mean(test$matches)
-  avgWinRate[which(pseq == p)] <- mean(test$wins/test$matches)
+  sim <- tournament(p, 10000)
+  averages[which(averages$p == p),]$matches <- mean(sim$matches)
+  averages[which(averages$p == p),]$rate <- mean(sim$wins/sim$matches)
 }  
 end <- Sys.time()
 end-start
 
-# create data frame for ggplot
-matchProb <- data.frame(p = pseq, matches = avgMatches, rate = avgWinRate)
 
-ggplot(matchProb, aes(x = p, y = avgMatches)) +     # plot total matches against probability
+ggplot(averages, aes(x = p, y = matches)) +     # plot total matches against probability
   geom_point() +
   xlab("Assumed win rate") +
   ylab("Total Number of Matches") +
@@ -113,7 +107,7 @@ ggplot(matchProb, aes(x = p, y = avgMatches)) +     # plot total matches against
 # effect driven by the format of this tournament.
 
 # plots to back up commentary 
-ggplot(matchProb, aes(x = p, y = rate)) +     # plot win rate against probability
+ggplot(averages, aes(x = p, y = rate)) +     # plot win rate against probability
   geom_point() +
   xlab("Assumed win rate") +
   ylab("Observed win rate") +
@@ -123,12 +117,9 @@ ggplot(matchProb, aes(x = p, y = rate)) +     # plot win rate against probabilit
   scale_x_continuous(breaks = seq(0,1,0.1)) +
   scale_y_continuous(breaks = seq(0,1,0.1))
 
-ggplot(matchProb, aes(x = p, y = (rate-p))) +     # plot win rate against probability
+ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probability
   geom_point() +
   xlab("Assumed win rate") +
   ylab("Observed Difference") +
   ggtitle("Observed differences between assumed win rate and observed win rate") +
   scale_x_continuous(breaks = seq(0,1,0.1)) 
-
-
-
