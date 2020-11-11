@@ -418,8 +418,63 @@ The problems in task 4 involved writing efficient R code to solve two problems u
 
 
 #### Problem-B 
+This problem considers a football tournament where a team keeps playing until they accrue 7 wins **or** 3 losses, with no draws allowed.
 
-### 4.2.1 
+### 4.2.1 Tournament Simualtion Contrusction
+To allow for simulation of results from the tournament detailed above, a "tournament" function was designed and implemented. The function takes win rate (p), which is fixed across all rounds, as an input and unless specified will take a randomly generated p ∈ [0, 1]. The function simulates the results of the tournament for a specified number of replicates, and stores the total number of wins, losses, matches played and the probability used in the simulation(s), returning them as a list in the output.
+
+``` {r}
+# function takes fixed p between 0 and 1 and 1 replicate as default 
+tournament <- function(p = runif(1, min = 0, max = 1), NRepeat = 1) {
+                    
+  totalWins <- rep(NA, NRepeat)       # win store
+  totalLosses <- rep(NA, NRepeat)     # loss store
+  totalMatches <- rep(NA, NRepeat)    # matches store
+  
+  # run tournament
+  set.seed(231215)             # reproducibility
+  
+  for (i in seq(NRepeat)) {
+    nWins <- 0                   # set win counter
+    nLosses <- 0                 # set loss counter
+  
+    while(nLosses < 3 & nWins < 7) {      # set stopping condition
+        result <- rbinom(n = 1, size = 1, prob = p)   # simulate game result
+       
+        if (result == 0) {  # 0 - loss
+          nLosses <- nLosses + 1
+        }
+        
+        if (result == 1) { # 1 - win
+          nWins <- nWins + 1
+        }
+        
+        nMatches <- nWins + nLosses            # find number of matches
+    }
+    
+    totalLosses[i] <- nLosses              # record wins, losses, matches and probabilities
+    totalWins[i] <- nWins                  
+    totalMatches[i] <- nMatches
+  
+  }
+  return(list(losses = totalLosses,         
+              matches = totalMatches,
+              wins = totalWins, 
+              probability = p
+             ))
+}
+
+
+
+```
+
+The output of a single run of the tournament for a fixed p is shown below:
+
+```{r, echo = FALSE}
+
+tournament()
+
+```
 
 ## Conclusion
 Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of different tournament formats in football.
