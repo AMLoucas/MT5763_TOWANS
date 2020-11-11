@@ -11,7 +11,8 @@ library(parallel)
 # Base tournament set up with repeats and data store
 # Initialisation
 
-tournament <- function(p) {
+# function takes fixed p between 0 and 1 as default 
+tournament <- function(p = runif(1, min = 0, max = 1)) {
   NRepeat <- 10000                    # number of replicates
   totalWins <- rep(NA, NRepeat)       # win store
   totalLosses <- rep(NA, NRepeat)     # loss store
@@ -19,7 +20,7 @@ tournament <- function(p) {
   probs <- rep(NA, NRepeat)           # probability store
   
   # run tournament
-  set.seed(231215)
+  set.seed(231215)             # reproducibility
   
   for (i in seq(NRepeat)) {
     nWins <- 0                   # set win counter
@@ -45,14 +46,13 @@ tournament <- function(p) {
     probs[i] <- p
   
   }
-  return(list(losses = totalLosses,
+  return(list(losses = totalLosses,         
               matches = totalMatches,
               wins = totalWins, 
               p = probs))
 }
 
-# for fixed p:
-tournament(runif(1, min = 0, max = 1))
+
 
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
