@@ -236,11 +236,11 @@ include_graphics("TASK1/Sope-Intercept.png")
 We then fitted a model on the provided dataset without applying a re-sampling algorithm on it. Our Intercept estimate value was approximately *96.153* and our Slope value was approximately *2.036* . We can see that the confidence intervals from Bootstrap algorithms contain the values and is approximately located in the middle of both of the histograms. This indicates our bootstrap results are "good", we also noticed that the two different bootstrap confidence intervals differ in values and width. This is due to the fact that every time we run the re-sampling software, new random sample data is constructed. You will have different results for both every time you execute the code. In general, both codes do the same procedure, the only difference is that regBootUpdated does it in a more efficient way. To obtain more precise confidence intervals, you will have to increase the number of simulations *N* you want apply. The larger the value of *N* the closer our confidence intervals will be to the true parameter. \
 
 
-## TASK-3 [Jackknife (SAS)]
+## 3 Jackknife (SAS)
 
 For this section we demonstrate a SAS program for obtaining the jackknife estimate of the standard error for the mean of given data. The SAS macro created for this purpose proceeds in the following fashion:
 
-### Jackknife Macro
+### 3.1 Jackknife Macro
 
 First we extract the sample mean and the size of the dataset. Then we use the SURVEYSELECT process to create a dataset containing n copies of the original data. We also create a dataset containing n copies of the sample mean, as we will later need to compute the difference between each of the jackknife samples and the sample mean.  
 
@@ -336,7 +336,7 @@ OPTIONS NONOTES;
 %jackKnife(WORK.SEALS, Lengths)
 ```
 
-### Standard Error Calculation and Efficiency Comparison
+### 3.2 Standard Error Calculation and Efficiency Comparison
 
 We also wrote the following SAS program in order to calculate the analytical estimate for standard error of mean length of the seals.
 
@@ -397,7 +397,7 @@ data _null_;
 run;
 ```
 
-### Jackknife Final Results
+### 3.3 Jackknife Final Results
 
 | Method     | Average Time Taken, s (n=20) | SE Estimate, cm |
 |------------|------------------------------|-----------------|
