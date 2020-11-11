@@ -103,13 +103,15 @@ Given API limitations, not all data shown will be available for all stocks. In p
 The US Stock Analyser shiny app uses API data and user inputs (stock name, date range and resolution) to display current stock quotes, stock price charts, analyst predictions and recommendations as well as company data and news. The plot are interactive, allowing user to see details for individual data points. In addition, the app has a refresh (button and automatic hourly refresh) and download functionality. Relevant explanations and error messages help the user to select adequate inputs and interpret the displayed outputs.
 
 
-## TASK-2 [Bootstrap (SAS)]
+## 2. SAS BootStrap Implementation
 
   In this exercise question we were provided a not very efficient bootstrap code. We had to modify the code in pursuing a more efficient bootstrap algorithm. We applied 4 main changes that optimized and made our bootstrap code more efficient. \
-  
+ 
+#### 2.1 Main changes applied
+
  * **We did not manually compute the number of rows of the original dataset.** \
 
-When applying the simulation, we want our sample data to have the same number rows as the original dataset. In the provided code the number of rows are obtained using the below chink of code: \
+When applying the simulation, we want our sample data to have the same number rows as the original dataset. In the provided code the number of rows are obtained using the code below: \
 ```{eval=FALSE}
 /*Number of rows in my dataset*/
  	data _null_;
@@ -176,6 +178,9 @@ DATA WORK.ESTIMATES;
 RUN;
 ```
 These were all the changes that were applied to modify the bootstrap algorithm and make it more efficient. We then ran simulation test with different number of N iterations. We used timers to calculate the time needed to execute the bootstrap function in isolation. \
+
+#### 2.2 Tests Run Results
+
 Below you can find the table that holds the different times for each N on both algorithm files. \
 The "regBootUpdated" is the modifies more effiecient bootstrap. \
 
@@ -192,8 +197,11 @@ The "regBootUpdated" is the modifies more effiecient bootstrap. \
 | 100000 	|    NULL    	|   0:00:07.79   	|
 
 From the table with the recorded times, we can conclude that the updated version (regBootUpdated)
-is indeed more efficient. The times have a huge difference, for the large values of N we can see a very big difference. The supplied bootstrap took 23 minutes to execute N = 50000, while the updated version needed only 3 minutes and 69 seconds. \
+is indeed more efficient. The times have a huge difference, for the large values of N we can see a very big difference. The supplied bootstrap took 23 minutes to execute N = 50000, while the updated version needed only 3.69 seconds. \
  \
+ 
+#### 2.3 Estimate Comparison
+ 
 In addition to making the algorithm more efficient, we had to compute the 95% Confidence intervals for the parameter estimates of interest. These values can be computed using the SAS in-built function of UNIVARIATE. We calculated the 95% confidence intervals from both programs. \
 ```{eval=FALSE}
 /* GET THE 95% CI of our estimates*/
