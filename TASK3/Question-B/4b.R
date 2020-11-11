@@ -98,9 +98,9 @@ matchProb <- data.frame(p = pseq, matches = avgMatches, rate = avgWinRate)
 
 ggplot(matchProb, aes(x = p, y = avgMatches)) +     # plot total matches against probability
   geom_point() +
-  xlab("Probability") +
+  xlab("Assumed win rate") +
   ylab("Total Number of Matches") +
-  ggtitle("Number of matches vs Probability") +
+  ggtitle("Number of matches vs Assumed win Rate") +
   geom_smooth(se = FALSE) +
   scale_x_continuous(breaks = seq(0,1,0.1)) +
   scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches))) 
@@ -115,9 +115,9 @@ ggplot(matchProb, aes(x = p, y = avgMatches)) +     # plot total matches against
 # plots to back up commentary 
 ggplot(matchProb, aes(x = p, y = rate)) +     # plot win rate against probability
   geom_point() +
-  xlab("Probability") +
-  ylab("Observed Win rate") +
-  ggtitle("Probability vs Observed Win Rate") +
+  xlab("Assumed win rate") +
+  ylab("Observed win rate") +
+  ggtitle("Observed Win Rate v Assumed win rate") +
   geom_smooth(se = FALSE) +
   geom_abline(aes(intercept = 0, slope = 1)) +
   scale_x_continuous(breaks = seq(0,1,0.1)) +
@@ -125,9 +125,9 @@ ggplot(matchProb, aes(x = p, y = rate)) +     # plot win rate against probabilit
 
 ggplot(matchProb, aes(x = p, y = abs(rate-p))) +     # plot win rate against probability
   geom_point() +
-  xlab("Probability") +
+  xlab("Assume win rate") +
   ylab("Observed Difference") +
-  ggtitle("Observed differences between probability and observed win rate") +
+  ggtitle("Observed differences between assumed win rate and observed win rate") +
   scale_x_continuous(breaks = seq(0,1,0.1)) 
 
 
