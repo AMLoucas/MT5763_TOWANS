@@ -1,5 +1,7 @@
 # Problem 4b
 library(tidyverse)
+library(doParallel)
+library(parallel)
 
 # tournament format: a team keeps playing until they accrue 
 # 7 wins or 3 losses (whichever comes first - no draws allowed). 
@@ -52,14 +54,8 @@ tournament <- function(p) {
 # for fixed p:
 tournament(runif(1, min = 0, max = 1))
 
-
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
-
-library(doParallel)
-library(parallel)
-
-detectCores()
 
 # Initialisation
 avgMatches <- rep(NA, 100) # average matches store
@@ -67,6 +63,9 @@ avgWinRate <- rep(NA, 100) # average matches store
 
 
 pseq <- seq(0,1,0.01) # probability sequence
+
+
+# Parallelise
 nCores <- 8 # no. of cores
 cl <- makeCluster(spec = nCores, type = "PSOCK")
 registerDoParallel(cl)
@@ -83,6 +82,8 @@ stopCluster(cl)
 
 end <- Sys.time()
 end-start
+
+# non parallelise 
 # run tournament
 start <- Sys.time()
 for (p in pseq){
