@@ -103,7 +103,7 @@ ggplot(matchProb, aes(x = p, y = avgMatches)) +     # plot total matches against
   ggtitle("Number of matches vs Assumed win Rate") +
   geom_smooth(se = FALSE) +
   scale_x_continuous(breaks = seq(0,1,0.1)) +
-  scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches))) 
+  scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches) + 1)) 
 
 
 
