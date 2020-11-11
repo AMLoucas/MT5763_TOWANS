@@ -14,6 +14,9 @@ library(knitr)
 
 #### Shiny GitHub repository: [https://github.com/janfor1/MT5763_Shiny](https://github.com/janfor1/MT5763_Shiny)
 
+## Abstract
+
+This project was divided into 4 different sections. For the **Shiny App** section we created a US stock analyzer that shows live us stock listings and prices in an interactive fashion. The app uses data from the Finnhub.io API, and allows the user to see changes in the stock over their chosen date range. It also displays information about the stock, recent news, and price targets. In the **Bootstrap** section we set out to create a more efficient version of the regBoot procedure in SAS. By making use of the SURVEYSELECT procedure and modifying other parts of the code, we were able to make the code significantly faster. For 100 loops, the new program executed in 0.04s as opposed to 2.44s for the old program, and the advantage held across a variety of loop sizes. In the **Jackknife** section our goal was to create efficient code for computing the jackknife estimate of the standard error of the mean of a variable. This was successful, as our macro produced the exact same result as the analytical estimate of the standard error for a dataset of seal lengths, and ran at an average of 0.308s per call. In the **Monte Carlo Simulation** section our goal was to use Monte Carlo simulation to investigate the sample variance of a particular sampling distribution, and consider the effects of a football tournament format.
 
 ## Introduction
 
