@@ -123,9 +123,9 @@ ggplot(matchProb, aes(x = p, y = rate)) +     # plot win rate against probabilit
   scale_x_continuous(breaks = seq(0,1,0.1)) +
   scale_y_continuous(breaks = seq(0,1,0.1))
 
-ggplot(matchProb, aes(x = p, y = abs(rate-p))) +     # plot win rate against probability
+ggplot(matchProb, aes(x = p, y = (rate-p))) +     # plot win rate against probability
   geom_point() +
-  xlab("Assume win rate") +
+  xlab("Assumed win rate") +
   ylab("Observed Difference") +
   ggtitle("Observed differences between assumed win rate and observed win rate") +
   scale_x_continuous(breaks = seq(0,1,0.1)) 
