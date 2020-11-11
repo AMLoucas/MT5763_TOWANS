@@ -11,9 +11,9 @@ library(parallel)
 # Base tournament set up with repeats and data store
 # Initialisation
 
-# function takes fixed p between 0 and 1 as default 
-tournament <- function(p = runif(1, min = 0, max = 1)) {
-  NRepeat <- 10000                    # number of replicates
+# function takes fixed p between 0 and 1 and 1 replicate as default 
+tournament <- function(p = runif(1, min = 0, max = 1), NRepeat = 1) {
+                    
   totalWins <- rep(NA, NRepeat)       # win store
   totalLosses <- rep(NA, NRepeat)     # loss store
   totalMatches <- rep(NA, NRepeat)    # matches store
@@ -71,11 +71,11 @@ registerDoParallel(cl)
 
 start <- Sys.time()
   avgMatches <-  foreach(p = pseq, .combine = "c") %dopar% {  
-              test <- tournament(p)
+              test <- tournament(p, 10000)
                mean(test$matches)}
   
   avgWinRate <-  foreach(p = pseq, .combine = "c") %dopar% {  
-              test <- tournament(p)
+              test <- tournament(p, 10000)
               mean(test$wins/test$matches)}
 stopCluster(cl)
 
@@ -86,7 +86,7 @@ end-start
 # run tournament
 start <- Sys.time()
 for (p in pseq){
-  test <- tournament(p)
+  test <- tournament(p, 10000)
   avgMatches[which(pseq == p)] <- mean(test$matches)
   avgWinRate[which(pseq == p)] <- mean(test$wins/test$matches)
 }  
