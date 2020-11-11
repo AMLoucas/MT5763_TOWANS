@@ -481,7 +481,7 @@ tournament()
 
 ### 4.2.2 How number of matches varies as a function of p 
 By first creating a sequence of win rates (p) from 0 to 1 in increments of 0.01 then simulating 10000 tournament replicates and taking the average number of matches played, for each p, a plot was created displaying how the number of matches played varies with p.
-``` {r, echo = FALSE, message = FALSE, fig.align = "centre", fig.cap = "Plot showing how the number of matches varies as a function of p. Each point represents the average number of matches played over 10000 tournament replicates for each p. Overlain is the (blue) curve fitted to the data"}
+``` {r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Plot showing how the number of matches varies as a function of p. Each point represents the average number of matches played over 10000 tournament replicates for each p. Overlain is the (blue) curve fitted to the data"}
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
 
@@ -513,15 +513,32 @@ matchProb <- data.frame(p = pseq, matches = avgMatches, rate = avgWinRate)
 
 ggplot(matchProb, aes(x = p, y = matches)) +     # plot total matches against probability
   geom_point() +
-  xlab("Probability") +
+  xlab("Assumed win rate") +
   ylab("Total Number of Matches") +
-  ggtitle("Number of matches vs Probability") +
+  ggtitle("Number of matches vs Assumed win Rate") +
   geom_smooth(se = FALSE) +
   scale_x_continuous(breaks = seq(0,1,0.1)) +
-  scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches))) 
-
+  scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches) + 1)) 
 
 ```
+
+### 4.2.3 Observed win rate relative to the assumed win rate
+To explore the differences between the observed win rate and the assumed win rate (p), using the 10000 tournament simulations for each p, the average win rate was calculated by finding the number of wins divided by the number of matches played and taking an average for each p. The plot of this data is shown below:
+
+```{r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Plot showing how the observed win rate compares to the assumed win rate.Each point represents the (average) observed win rate for each p with a fitted line overlain in blue. The black line represents observed win rate = assumed win rate."}
+# plots to back up commentary 
+ggplot(matchProb, aes(x = p, y = rate)) +     # plot win rate against probability
+  geom_point() +
+  xlab("Assumed win rate") +
+  ylab("Observed win rate") +
+  ggtitle("Observed Win Rate vs Assumed win rate") +
+  geom_smooth(se = FALSE) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  scale_y_continuous(breaks = seq(0,1,0.1))
+
+```
+From the plot is can be seen that only at very low probabilities and at high probabilities does the expected data fit as would be expected, with the observed win rate being lower than the assumed win rate for values within the region of around [0.01, 0.85] and appearing to be slightly higher within the region of around [0.87, 0.98]. Given that the structure of the tournament is such that losses are "favoured" since a team must accrue over twice as many wins as losses for the tournament to end as a result of wins, it is more likely that a teams stop playing as a result of losses. This means that for lower assumed win rates, teams will be losing more games than they are winning and the tournament will likely be stopped based on number of losses. As assumed win rate increases, the observed win rate increases closer to the assumed rate as teams should be winning more games and have more chance of ending the tournament as a result of accruing 7 wins. Despite this increase, the observed win rate will likely stay below the assumed win rate since although teams with p > 0.5 should expect to win more games than they lose, they can only play more games if the team stays below the 3 losses threshold, and so even if a team over 10 games was to win 7 and lose 3, such is the structure of the tournament that losses occurring before the wins will minimise the observed win rate.
 
 ## Conclusion
 Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of different tournament formats in football.
