@@ -7,6 +7,9 @@ output:
 # Allow to include graphics in report.
 options(tinytex.verbose = TRUE)
 library(knitr)
+library(doParallel)
+library(parallel)
+library(tidyverse)
 ```
 
 
@@ -420,7 +423,7 @@ The problems in task 4 involved writing efficient R code to solve two problems u
 #### Problem-B 
 This problem considers a football tournament where a team keeps playing until they accrue 7 wins **or** 3 losses, with no draws allowed.
 
-### 4.2.1 Tournament Simualtion Contrusction
+### 4.2.1 Tournament Simualtion Construction
 To allow for simulation of results from the tournament detailed above, a "tournament" function was designed and implemented. The function takes win rate (p), which is fixed across all rounds, as an input and unless specified will take a randomly generated p ∈ [0, 1]. The function simulates the results of the tournament for a specified number of replicates, and stores the total number of wins, losses, matches played and the probability used in the simulation(s), returning them as a list in the output.
 
 ``` {r}
@@ -476,6 +479,50 @@ tournament()
 
 ```
 
+### 4.2.2 How number of matches varies as a function of p 
+By first creating a sequence of win rates (p) from 0 to 1 in increments of 0.01 then simulating 10000 tournament replicates and taking the average number of matches played, for each p, a plot was created displaying how the number of matches played varies with p.
+``` {r, echo = FALSE, message = FALSE, fig.align = "centre", fig.cap = "Plot showing how the number of matches varies as a function of p. Each point represents the average number of matches played over 10000 tournament replicates for each p. Overlain is the (blue) curve fitted to the data"}
+#Plot how the total number of matches played (i.e. wins + losses) 
+#varies as a function of p.
+
+# Initialisation
+avgMatches <- rep(NA, 100) # average matches store
+avgWinRate <- rep(NA, 100) # average matches store
+
+pseq <- seq(0,1,0.01) # probability sequence
+
+# Parallelise to increase efficiency 
+
+nCores <- 8 # no. of cores
+cl <- makeCluster(spec = nCores, type = "PSOCK")
+registerDoParallel(cl)
+
+start <- Sys.time()
+  avgMatches <-  foreach(p = pseq, .combine = "c") %dopar% {  
+              test <- tournament(p, 10000)
+               mean(test$matches)}
+  
+  avgWinRate <-  foreach(p = pseq, .combine = "c") %dopar% {  
+              test <- tournament(p, 10000)
+              mean(test$wins/test$matches)}
+stopCluster(cl)
+ 
+
+# create data frame for ggplot
+matchProb <- data.frame(p = pseq, matches = avgMatches, rate = avgWinRate)
+
+ggplot(matchProb, aes(x = p, y = matches)) +     # plot total matches against probability
+  geom_point() +
+  xlab("Probability") +
+  ylab("Total Number of Matches") +
+  ggtitle("Number of matches vs Probability") +
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches))) 
+
+
+```
+
 ## Conclusion
 Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of different tournament formats in football.
 
@@ -485,7 +532,7 @@ For this project, each team member initially took responsibility for one of the 
 For collaborative coding, we used a GitHub repository that was shared with the entire team. Separate folders were created for the 3 tasks (the Shiny app was stored in a separate repository) to provide a clear file structure. Using regular commits and Readme files ensured that everyone could clearly see how far each task was coming along and what conclusions and results have been obtained.
 
 ### Task Outcomes
-For each task, we implemented the adequate code in R or SAS to produce the required deliverable and draw conclusions abbout the techniques investigated.
+For each task, we implemented the adequate code in R or SAS to produce the required deliverable and draw conclusions about the techniques investigated.
 
 #### Shiny App (R)
 For the Shiny task, we have created a US Stock Analyser app. This Shiny app imports data from a stock market API to display stock quotes, charts, analyst predictions as well as company information and news. The UI elements enable the user to select relevant inputs and to refresh and download the data. Stock market web apps such as this are used every day by traders, journalists and other stakeholders to keep track of the financial markets.
