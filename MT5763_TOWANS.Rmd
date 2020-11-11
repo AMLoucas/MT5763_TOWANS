@@ -419,25 +419,40 @@ As we can see here our Jackknife process is slightly less efficient than calcula
 
 #### Problem-B 
 
-## Conclusions
-<!-- General explanation of project (and component tasks)-->
+## Conclusion
+Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of different tournament formats in football.
 
 ### Collaboration & Using GitHub
-<!-- What we found difficult and not. How we worked as a team -->
+For this project, each team member initially took responsibility for one of the tasks, based upon their programming experience, strengths and preferences. Each person focused on their own task to begin with, working towards the solution and deliverable. Throughout this process, team members also collaborated with each other for assistance and/or feedback regarding certain parts of the tasks. Once an initial draft was completed, each part was then presented to the entire team, allowing for corrections/feedback. This process enabled us to continuously improve upon our work.
+
+For collaborative coding, we used a GitHub repository that was shared with the entire team. Separate folders were created for the 3 tasks (the Shiny app was stored in a separate repository) to provide a clear file structure. Using regular commits and Readme files ensured that everyone could clearly see how far each task was coming along and what conclusions and results have been obtained.
 
 ### Task Outcomes
+For each task, we implemented the adequate code in R or SAS to produce the required deliverable and draw conclusions abbout the techniques investigated.
 
 #### Shiny App (R)
-<!-- 2-3 sentences summarising findings and potential real world application-->
+For the Shiny task, we have created a US Stock Analyser app. This Shiny app imports data from a stock market API to display stock quotes, charts, analyst predictions as well as company information and news. The UI elements enable the user to select relevant inputs and to refresh and download the data. Stock market web apps such as this are used every day by traders, journalists and other stakeholders to keep track of the financial markets.
+
 #### Bootstrapping (SAS)
-<!-- 2-3 sentences summarising findings and potential real world application-->
+In the bootstrapping section we modified the regBoot algorithm in SAS and used the SURVEYSELECT procedure to create a much more efficient bootstrapping method, enabling us to efficiently calculate coefficients for a linear model. This new procedure was able to run 50,000 loops of the bootstrap in just 3.69 seconds instead of more than 23 minutes for the original code. Improving the efficiency of code, such as done in this task, is essential for statisticians. Efficient algorithms in research or industry are essential, as programmers often work with very large number bootstrap samples and may be constrained by computing power due budget limitations.
+
 #### Jackknife (SAS)
-<!-- 2-3 sentences summarising findings and potential real world application-->
+For the Jackknife task, we have created and implemented code for an efficient Jackknife method, to estimate the standard error of the mean seal lengths for the data provided. Our method provided an identical result to the analytic estimate, with a run time of just 0.308s. As with the bootstrap example, such methods are being used and furtehr developed by statisticians around the world to make the computation of statistical estimates more effciient.
+
 #### Monte Carlo Simulations (R)
 <!-- 2-3 sentences summarising findings and potential real world application-->
 
 ### Further Exploration
-<!-- very brief outline of how certain tasks could be investigated further/from a different perspective-->
+While working through this project and the respective tools and methods, we have identified several further avenues of exploration, that could be of interest in the subsequent studies.
+
+* **Shiny App:** There are almost infinite possibilities with regards to expanding the features of the US stock analyser Shiny app. In particular, one could add technical stock market indicators (such as On-Balance volume and accumulation/distribution lines) as well as other ratios and tools used by financial analysts.
+
+* **Bootstrap:** It would be of interest to investigate how the updated bootstrapping procedure could be applied to more than 1 covariate and if it is possible to make it even more efficient when working with an extremely large numebr of loops.
+
+* **Jackknife:** 
+
+* **Monte Carlo Simulation:** 
+
 
 ## APPENDIX
 <!-- Full code snippets of the tasks -->
