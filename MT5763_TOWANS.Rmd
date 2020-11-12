@@ -743,9 +743,9 @@ While working through this project and the respective tools and methods, we have
 
 * **Bootstrap:** It would be of interest to investigate how the updated bootstrapping procedure could be applied to more than 1 covariate and if it is possible to make it even more efficient when working with an extremely large numebr of loops.
 
-* **Jackknife:** 
+* **Jackknife:** In our example the jackknife estimate was identical to the analytical estimate and we could investigate whether that holds for other datasets and variables, in particular those with non-standard distributions.
 
-* **Monte Carlo Simulation:** 
+* **Monte Carlo Simulation:** For the football tournament, it would be informative to explore how further changes to the tournament format, such as by modifying the exit conditions for teams, that might change which teams are benefited. 
 
 
 ## APPENDIX
