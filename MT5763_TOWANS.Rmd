@@ -419,6 +419,8 @@ run;
 | Analytical |                0.096         |   0.5537712468  |
 | Jackknife  |                0.308         |   0.5537712468  |
 
+Table: Table 3.3.1. Results of Jacknife Estimate for Error
+
 As we can see here our Jackknife process is slightly less efficient than calculating the standard error analytically. We found the exact same value for the standard error as the analytical method so we can infer that we have a reliable estimate. 
 
 
