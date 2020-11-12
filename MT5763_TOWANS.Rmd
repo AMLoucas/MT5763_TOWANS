@@ -427,6 +427,116 @@ The problems in task 4 involved writing efficient R code to solve two problems u
 
 #### Problem-A 
 
+In this section, we use Monte Carlo simulation as well as bootstrapping to compute the probability of $X>Y$, with
+$X \sim N(\mu=4,\sigma^2=10)$, $Y \sim U(a=2,b=8)$ being two independent random variables, and derive the sample distribution for the estimated probability, and finally show the relation between sample variance and number of Monte Carlo simulations.
+
+### 4.1.1 Compute probability
+
+First we randomly generate N $X$s and N $Y$s. Then the estimated probability of $X$ greater than $Y$ is:  $\widehat{p} = \frac{number of (X > Y)}{N}$.
+
+```{r}
+# Simulate the observed data
+set.seed(45214)           # for reproducibility
+N <- 1000                 # Specify the number of datasets to be simulated
+x <- rnorm(N,4,sqrt(10))  # create the "observed" data for x
+y <- runif(N,2,8)         # create the "observed" data for y
+
+# calculate the probability
+p <- sum(x > y)/N
+print(p)
+```
+
+For N=1000, we got the estimated probability with value 0.401.
+
+### 4.1.2 Sampling distribution
+
+We then use bootstrapping to derive the sampling distribution for the estimated probability of $X>Y$ and demonstrate it in a histogram.
+
+```{r, message=FALSE}
+# create data
+regData <- data.frame(x,y)
+
+# Define a function called BootStrap for bootstrapping
+# with variables inputData and nBoot
+BootStrap <- function(inputData, nBoot){
+  
+  set.seed(56337)   # for reproducibility
+  bootResults <- array(dim=c(nBoot, 1))  # results
+  
+  # Loop across all samples
+  for(i in 1:nBoot){
+    
+    # resample our data with replacement
+    bootData <- inputData[sample(1:nrow(inputData), nrow(inputData), replace = T),]
+    
+    # find the number for X>Y
+    tot <- sum(bootData[,1] > bootData[,2])
+    
+    # Store results
+    bootResults[i] <- tot/nrow(inputData)
+    
+  }
+  
+  bootResults
+  
+} # end of function
+
+
+# derive the sample variance
+sample_distri <- BootStrap(regData,nBoot = 1000)
+
+# Plot the histogram
+ggplot(data.frame(sample_distri)) +
+  geom_histogram(aes(sample_distri), colour = "black", fill = "orange", alpha = 0.1) +
+  geom_vline(xintercept = p, col="purple", lwd=1) +
+  ggtitle("Histogram of Pr(X>Y)") +
+  xlab("Pr(X > Y)") +
+  ylab("Frequency")
+```
+
+### 4.1.3 Sample variance vs number of Monte Carlo simulations
+
+Finally, we would like to see how the sample variance of the sampling distribution generated above changes as a function of the number of Monte Carlo simulations.
+
+```{r,message=FALSE}
+# Create empty data frame to append estimations to
+sample_var_final <- data.frame(number_of_simulations = 0, variance = 0)
+
+# Loop through varying numbers of MC simulations
+# from 500 to 5000, by step 10
+for (k in seq(500,5000,10)){
+  
+  # Simulate observed data
+  set.seed(45214)           # for reproducibility
+  x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
+  y <- runif(k,2,8)         # create the "observed" data for y
+  regData2 <- data.frame(x,y)
+
+  # Bootstrapping to derive each sampling distribution
+  # for number of MC simulations with value k
+  sample_distri <- BootStrap(regData2,nBoot = 1000)
+  
+  # Store variance of sample distribution for this iteration
+  sample_var <- data.frame(number_of_simulations = k, variance = var(sample_distri))
+  
+  # append this iteration to the final table
+  sample_var_final <- rbind(sample_var_final,sample_var)
+}
+
+# adjust the final table
+sample_var_final <- sample_var_final[-1,]
+
+
+# Plot the graph of variance against number of simulations
+ggplot(sample_var_final) +
+  geom_point(aes(x = 1/number_of_simulations, y = variance), colour = "orange") +
+  geom_smooth(aes(x = 1/number_of_simulations,y = variance), method = lm) +
+  xlab("Inverse of number of Monte Carlo simulations") +
+  ylab("Variance of sample distribution") +
+  ggtitle("Sample variance against number of simulations")
+```
+
+From the graph above, we can see that there seems to be a linear relation between the sample variance and inverse of number of Monte Carlo simulation.
 
 
 #### Problem-B 
