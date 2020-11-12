@@ -436,7 +436,7 @@ $X \sim N(\mu=4,\sigma^2=10)$, $Y \sim U(a=2,b=8)$ being two independent random 
 
 First we randomly generate N $X$s and N $Y$s. Then the estimated probability of $X$ greater than $Y$ is:  $\widehat{p} = \frac{number of (X > Y)}{N}$.
 
-```{r}
+```{r, eval = FALSE}
 # Simulate the observed data
 set.seed(45214)           # for reproducibility
 N <- 1000                 # Specify the number of datasets to be simulated
@@ -454,7 +454,7 @@ For N=1000, we got the estimated probability with value 0.401.
 
 We then use bootstrapping to derive the sampling distribution for the estimated probability of $X>Y$ and demonstrate it in a histogram.
 
-```{r, message=FALSE}
+```{r, message=FALSE, eval=FALSE}
 # create data
 regData <- data.frame(x,y)
 
@@ -500,7 +500,7 @@ ggplot(data.frame(sample_distri)) +
 
 Finally, we would like to see how the sample variance of the sampling distribution generated above changes as a function of the number of Monte Carlo simulations.
 
-```{r,message=FALSE}
+```{r,message=FALSE, eval=FALSE}
 # Create empty data frame to append estimations to
 sample_var_final <- data.frame(number_of_simulations = 0, variance = 0)
 
