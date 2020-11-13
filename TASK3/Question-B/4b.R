@@ -63,14 +63,14 @@ nCores <- 8 # no. of cores
 cl <- makeCluster(spec = nCores, type = "PSOCK")
 registerDoParallel(cl)
 
-start <- Sys.time()
+
 averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
   sim <- tournament(p, 10000)
   matches <-(mean(sim$matches))
   rate <- (mean(sim$wins/sim$matches))
   data.frame(p, matches, rate)
 }
-end <- Sys.time()
+
 stopCluster(cl)
 
 
@@ -79,14 +79,13 @@ stopCluster(cl)
 
 averages <- data.frame(p = pseq, matches = rep(NA,101), rate = rep(NA,101))
 
-start <- Sys.time()
+
 for (p in pseq){
   sim <- tournament(p, 10000)
   averages[which(averages$p == p),]$matches <- mean(sim$matches)
   averages[which(averages$p == p),]$rate <- mean(sim$wins/sim$matches)
 }  
-end <- Sys.time()
-end-start
+
 
 
 ggplot(averages, aes(x = p, y = matches)) +     # plot total matches against probability
@@ -141,10 +140,10 @@ for(i in 1:10){
     data.frame(p, matches, rate)
   }
   end <- Sys.time()
-  times[i] <- end-start
+  times[i] <- end-start      # store run time for each iterate
   stopCluster(cl)
 }
-avgP <- mean(times)
+avgP <- mean(times) # find average run time
 
 times <- rep(NA,10)
 for(i in 1:10){
@@ -155,6 +154,6 @@ for(i in 1:10){
     averages[which(averages$p == p),]$rate <- mean(sim$wins/sim$matches)
   }  
   end <- Sys.time()
-  times[i] <- end-start
+  times[i] <- end-start       # store run time for each iterate
 }
-avgNP <- mean(times)
+avgNP <- mean(times) # find average run time
