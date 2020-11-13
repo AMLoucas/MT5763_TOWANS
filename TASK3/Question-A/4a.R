@@ -117,9 +117,15 @@ stopCluster(cl)
 
 # Plot the graph of variance against number of simulations
 ggplot(sample_var_final) +
-  geom_point(aes(x = number_of_simulations, y = variance), colour = "orange") +
-  geom_smooth(aes(x = number_of_simulations,y = variance)) +
-  xlab("Number of Monte Carlo simulations") +
+  geom_point(aes(x = 1/number_of_simulations, y = variance), colour = "orange") +
+  geom_smooth(aes(x = 1/number_of_simulations,y = variance), method = "lm") +
+  xlab("Inverse number of Monte Carlo simulations") +
   ylab("Variance of sample distribution") +
   ggtitle("Sample variance against number of simulations")
 
+ggplot(sample_var_final) +
+  geom_point(aes(x = number_of_simulations, y = variance), colour = "orange") +
+  geom_smooth(aes(x = number_of_simulations,y = variance), se = FALSE) +
+  xlab("Number of Monte Carlo simulations") +
+  ylab("Variance of sample distribution") +
+  ggtitle("Sample variance against number of simulations")
