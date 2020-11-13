@@ -2,7 +2,8 @@
 # Monte Carlo simulation
 
 library(tidyverse)
-
+library(doParallel)
+library(parallel)
 # Question 1 - Compute the probability
 
 # Simulate the observed data
@@ -64,12 +65,17 @@ ggplot(data.frame(sample_distri)) +
 
 # Question 3 - how sample variance varies with No. of simulations
 
-# Create empty data frame to append estimations to
-sample_var_final <- data.frame(number_of_simulations = 0, variance = 0)
+
 
 # Loop through varying numbers of MC simulations
 # from 500 to 5000, by step 10
-for (k in seq(500,5000,10)){
+nSim <- seq(500, 5000, 10)
+
+# Create empty data frame to append estimations to
+sample_var_final <- data.frame(number_of_simulations = nSim, variance = rep(NA, 451))
+
+start <- Sys.time()
+for (k in nSim){
   
   # Simulate observed data
   set.seed(45214)           # for reproducibility
@@ -82,15 +88,31 @@ for (k in seq(500,5000,10)){
   sample_distri <- BootStrap(regData2,nBoot = 1000)
   
   # Store variance of sample distribution for this iteration
-  sample_var <- data.frame(number_of_simulations = k, variance = var(sample_distri))
-  
-  # append this iteration to the final table
-  sample_var_final <- rbind(sample_var_final,sample_var)
+ 
+  sample_var_final[which(sample_var_final$number_of_simulations == k),]$variance <- var(sample_distri)
 }
+end <- Sys.time()
+end-start
 
-# adjust the final table
-sample_var_final <- sample_var_final[-1,]
+# Parallelise
+nCores <- 8 # no. of cores
+cl <- makeCluster(spec = nCores, type = "PSOCK")
+registerDoParallel(cl)
 
+start <- Sys.time()
+sample_var_final <- foreach(k = nSim, .combine='rbind', .multicombine=TRUE) %dopar% {
+  set.seed(45214)           # for reproducibility
+  x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
+  y <- runif(k,2,8)         # create the "observed" data for y
+  regData2 <- data.frame(x,y)
+  sample_distri <- BootStrap(regData2,nBoot = 1000)
+  number_of_simulations <- k
+  variance <- var(sample_distri)
+  data.frame(number_of_simulations, variance)
+}
+end <- Sys.time()
+end-start
+stopCluster(cl)
 
 # Plot the graph of variance against number of simulations
 ggplot(sample_var_final) +
