@@ -68,11 +68,12 @@ ggplot(data.frame(sample_distri)) +
 
 
 # Loop through varying numbers of MC simulations
-# from 500 to 5000, by step 10
-nSim <- seq(500, 5000, 10)
+# from 5 to 200
+nSim <- seq(5, 200)
 
+# Non - parallelised version
 # Create empty data frame to append estimations to
-sample_var_final <- data.frame(number_of_simulations = nSim, variance = rep(NA, 451))
+sample_var_final <- data.frame(number_of_simulations = nSim, variance = rep(NA, length(nSim)))
 
 start <- Sys.time()
 for (k in nSim){
@@ -116,9 +117,9 @@ stopCluster(cl)
 
 # Plot the graph of variance against number of simulations
 ggplot(sample_var_final) +
-  geom_point(aes(x = 1/number_of_simulations, y = variance), colour = "orange") +
-  geom_smooth(aes(x = 1/number_of_simulations,y = variance), method = lm) +
-  xlab("Inverse of number of Monte Carlo simulations") +
+  geom_point(aes(x = number_of_simulations, y = variance), colour = "orange") +
+  geom_smooth(aes(x = number_of_simulations,y = variance)) +
+  xlab("Number of Monte Carlo simulations") +
   ylab("Variance of sample distribution") +
   ggtitle("Sample variance against number of simulations")
 
