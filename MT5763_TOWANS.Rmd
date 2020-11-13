@@ -450,7 +450,7 @@ $X \sim N(\mu=4,\sigma^2=10)$, $Y \sim U(a=2,b=8)$ being two independent random 
 
 First we randomly generate N $X$s and N $Y$s. Then the estimated probability of $X$ greater than $Y$ is:  $\widehat{p} = \frac{number of (X > Y)}{N}$.
 
-```{r, eval = FALSE}
+```{r}
 # Simulate the observed data
 set.seed(45214)           # for reproducibility
 N <- 1000                 # Specify the number of datasets to be simulated
@@ -468,7 +468,7 @@ For N=1000, we got the estimated probability with value 0.401.
 
 We then use bootstrapping to derive the sampling distribution for the estimated probability of $X>Y$ and demonstrate it in a histogram.
 
-```{r, message=FALSE, eval=FALSE}
+```{r, message=FALSE, echo = FALSE}
 # create data
 regData <- data.frame(x,y)
 
@@ -514,42 +514,51 @@ ggplot(data.frame(sample_distri)) +
 
 Finally, we would like to see how the sample variance of the sampling distribution generated above changes as a function of the number of Monte Carlo simulations.
 
-```{r,message=FALSE, eval=FALSE}
+```{r,message=FALSE,echo = FALSE}
 # Create empty data frame to append estimations to
 sample_var_final <- data.frame(number_of_simulations = 0, variance = 0)
 
 # Loop through varying numbers of MC simulations
 # from 500 to 5000, by step 10
-for (k in seq(500,5000,10)){
-  
-  # Simulate observed data
+nSim <- seq(5, 200)
+nCores <- detectCores() # no. of cores
+cl <- makeCluster(spec = nCores, type = "PSOCK")
+registerDoParallel(cl)
+
+
+sample_var_final <- foreach(k = nSim, .combine='rbind', .multicombine=TRUE) %dopar% {
   set.seed(45214)           # for reproducibility
   x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
   y <- runif(k,2,8)         # create the "observed" data for y
   regData2 <- data.frame(x,y)
-
-  # Bootstrapping to derive each sampling distribution
-  # for number of MC simulations with value k
-  sample_distri <- BootStrap(regData2,nBoot = 1000)
-  
-  # Store variance of sample distribution for this iteration
-  sample_var <- data.frame(number_of_simulations = k, variance = var(sample_distri))
-  
-  # append this iteration to the final table
-  sample_var_final <- rbind(sample_var_final,sample_var)
+  sample_distri <- BootStrap(regData2,nBoot = 1000)   # carry out bootstrap
+  number_of_simulations <- k                
+  variance <- var(sample_distri)            # find variance of simulation
+  data.frame(number_of_simulations, variance)           
 }
 
-# adjust the final table
-sample_var_final <- sample_var_final[-1,]
+stopCluster(cl)
 
+
+```
+
+```{r, echo = FALSE, message = FALSE, fig.show="hold", out.width="50%", fig.cap = "Figure 4.1.1: (LEFT) Plot of sample variance against inverse number of Monte Carlo simulations. Each point represents the sample variance for 1/n Monte Carlo Simulations. Overlain is a fitted linear model to the data, highlighting the relationship. (RIGHT) Plot of sample variance against number of Monte Carlo simulations. Each point represents the sample variance for n Monte Carlo Simulations. Overlain is a fitted model to the data, highlighting the relationship"}
 
 # Plot the graph of variance against number of simulations
 ggplot(sample_var_final) +
   geom_point(aes(x = 1/number_of_simulations, y = variance), colour = "orange") +
-  geom_smooth(aes(x = 1/number_of_simulations,y = variance), method = lm) +
-  xlab("Inverse of number of Monte Carlo simulations") +
+  geom_smooth(aes(x = 1/number_of_simulations,y = variance), method = "lm", se = FALSE) +
+  xlab("Inverse number of Monte Carlo simulations") +
   ylab("Variance of sample distribution") +
   ggtitle("Sample variance against number of simulations")
+
+ggplot(sample_var_final) +
+  geom_point(aes(x = number_of_simulations, y = variance), colour = "orange") +
+  geom_smooth(aes(x = number_of_simulations,y = variance), se = FALSE) +
+  xlab("Number of Monte Carlo simulations") +
+  ylab("Variance of sample distribution") +
+  ggtitle("Sample variance against number of simulations")
+
 ```
 
 From the graph above, we can see that there seems to be a linear relation between the sample variance and inverse of number of Monte Carlo simulation.
@@ -616,7 +625,7 @@ tournament()
 
 ### 4.2.2 How number of matches varies as a function of p 
 By first creating a sequence of win rates (p) from 0 to 1 in increments of 0.01 then simulating 10000 tournament replicates and taking the average number of matches played, for each p, a plot was created displaying how the number of matches played varies with p.
-``` {r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Plot showing how the number of matches varies as a function of p. Each point represents the average number of matches played over 10000 tournament replicates for each p. Overlain is the (blue) curve fitted to the data"}
+``` {r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Figure 4.2.1: Plot showing how the number of matches varies as a function of p. Each point represents the average number of matches played over 10000 tournament replicates for each p. Overlain is the (blue) curve fitted to the data"}
 #Plot how the total number of matches played (i.e. wins + losses) 
 #varies as a function of p.
 
@@ -629,7 +638,6 @@ registerDoParallel(cl)
 
 averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
   sim <- tournament(p, 10000)
-  p <- p
   matches <-(mean(sim$matches))
   rate <- (mean(sim$wins/sim$matches))
   data.frame(p, matches, rate)
@@ -652,7 +660,7 @@ ggplot(averages, aes(x = p, y = matches)) +     # plot total matches against pro
 ### 4.2.3 Observed win rate relative to the assumed win rate
 To explore the differences between the observed win rate and the assumed win rate (p), using the 10000 tournament simulations for each p, the average win rate was calculated by finding the number of wins divided by the number of matches played and taking an average for each p. The plot of this data is shown below:
 
-```{r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Plot showing how the observed win rate compares to the assumed win rate.Each point represents the (average) observed win rate for each p with a fitted line overlain in blue. The black line represents observed win rate = assumed win rate."}
+```{r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Figure 4.2.2: Plot showing how the observed win rate compares to the assumed win rate.Each point represents the (average) observed win rate for each p with a fitted line overlain in blue. The black line represents observed win rate = assumed win rate."}
 
 # plots to back up commentary 
 ggplot(averages, aes(x = p, y = rate)) +     # plot win rate against probability
@@ -682,50 +690,30 @@ ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probabi
 ```
 The negative observed differences are as a result of the conclusions drawn from the previous plot. This plot highlights that fpr high assumed win rates, around [0.8, 0.99] the observed win rate is higher than the assumed win rate. The likely explanation for this is again down to the format of the tournament. At an assumed win rate of 1, a team will win every game, every time and end the tournament as a result of winning all 7 matches they play and so observed win rate = assumed win rate. However, for the higher assumed win rates that are still less than 1, it remains a possibility that a team will win close to, if not, all of their games. This will result in an observed win rate that is higher than the assumed rate.
 
-### 4.2.4 Parallelisation 
-In order to make the code in this section as efficient as possible, the effect of parallelisation was considered when simulating a large number of replicates (100 probabilities, 10000 times each). The method was carried out using a parallelised and a non-parallelised method and the time taken for both methods to run were compared.
+### 4.3 Parallelisation 
+In order to make the code in this section as efficient as possible, the effect of parallelisation was considered when carrying out the Monte Carlo simulations for parts A and B. 
 
-The run time on the parallelised method was found to be consistently lower than the non-parallised method, and so it was this method that was used within analyses.
+|     Method       | Average Time Taken (seconds) | 
+|------------------|------------------------------|
+| Parallelised     |           6.947466           | 
+| Non-Parallelised |           18.66307           | 
 
-For the parallelised method, a typical run time was:
 
-``` {r, echo = FALSE}
-# Initialisation
-pseq <- seq(0,1,0.01) # probability sequence
+(100 probabilities, 10000 times each). The method was carried out using a parallelised and a non-parallelised method and the time taken for both methods to run were compared.
 
-# Parallelise
-nCores <- 8 # no. of cores
-cl <- makeCluster(spec = nCores, type = "PSOCK")
-registerDoParallel(cl)
+The run time on the parallelised method was found to be consistently lower than the non-parallelised method, and so it was this method that was used within analyses. The table below shows the average run times for the two methods over 10 repeats, with the parallelised method running at almost 3 times faster than the non-parallelised method.
 
-start <- Sys.time()
-averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
-  sim <- tournament(p, 10000)
-  p <- p
-  matches <-(mean(sim$matches))
-  rate <- (mean(sim$wins/sim$matches))
-  data.frame(p, matches, rate)
-}
-end <- Sys.time()
-end-start
 
-```
-And for the non-parallelised method, a typical run time was:
 
-``` {r, echo = FALSE, warning = FALSE}
 
-pseq <- seq(0,1,0.01) # probability sequence
- 
-averages <- data.frame(p = pseq, matches = rep(NA,101), rate = rep(NA,101))
-start <- Sys.time()
-for (p in pseq){
-  sim <- tournament(p, 10000)
-  averages[which(averages$p == p),]$matches <- mean(sim$matches)
-  averages[which(averages$p == p),]$rate <- mean(sim$wins/sim$matches)
-}  
-end <- Sys.time()
-end-start
-```
+
+|     Method       | Average Time Taken (seconds) | 
+|------------------|------------------------------|
+| Parallelised     |           4.67162            | 
+| Non-Parallelised |          13.48815            | 
+
+
+
 
 ## Conclusion
 Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of different tournament formats in football.
