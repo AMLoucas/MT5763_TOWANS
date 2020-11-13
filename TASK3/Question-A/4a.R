@@ -75,7 +75,6 @@ nSim <- seq(5, 200)
 # Create empty data frame to append estimations to
 sample_var_final <- data.frame(number_of_simulations = nSim, variance = rep(NA, length(nSim)))
 
-start <- Sys.time()
 for (k in nSim){
   
   # Simulate observed data
@@ -92,15 +91,14 @@ for (k in nSim){
  
   sample_var_final[which(sample_var_final$number_of_simulations == k),]$variance <- var(sample_distri)
 }
-end <- Sys.time()
-end-start
+
 
 # Parallelise
 nCores <- detectCores() # no. of cores
 cl <- makeCluster(spec = nCores, type = "PSOCK")
 registerDoParallel(cl)
 
-start <- Sys.time()
+
 sample_var_final <- foreach(k = nSim, .combine='rbind', .multicombine=TRUE) %dopar% {
   set.seed(45214)           # for reproducibility
   x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
@@ -111,8 +109,7 @@ sample_var_final <- foreach(k = nSim, .combine='rbind', .multicombine=TRUE) %dop
   variance <- var(sample_distri)
   data.frame(number_of_simulations, variance)
 }
-end <- Sys.time()
-end-start
+
 stopCluster(cl)
 
 # Plot the graph of variance against number of simulations
