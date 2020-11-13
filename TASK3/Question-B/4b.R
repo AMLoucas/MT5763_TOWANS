@@ -58,7 +58,6 @@ tournament <- function(p = runif(1, min = 0, max = 1), NRepeat = 1) {
 
 pseq <- seq(0,1,0.01) # probability sequence
 
-
 # Parallelise
 nCores <- 8 # no. of cores
 cl <- makeCluster(spec = nCores, type = "PSOCK")
@@ -72,8 +71,8 @@ averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
   data.frame(p, matches, rate)
 }
 end <- Sys.time()
-end-start
 stopCluster(cl)
+
 
 # non parallelise 
 # run tournament
@@ -123,3 +122,39 @@ ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probabi
   ylab("Observed Difference") +
   ggtitle("Observed differences between assumed win rate and observed win rate") +
   scale_x_continuous(breaks = seq(0,1,0.1)) 
+
+
+# run speed testing
+
+times <- rep(NA,10)
+for(i in 1:10){
+  # Parallelise
+  nCores <- 8 # no. of cores
+  cl <- makeCluster(spec = nCores, type = "PSOCK")
+  registerDoParallel(cl)
+  
+  start <- Sys.time()
+  averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
+    sim <- tournament(p, 10000)
+    matches <-(mean(sim$matches))
+    rate <- (mean(sim$wins/sim$matches))
+    data.frame(p, matches, rate)
+  }
+  end <- Sys.time()
+  times[i] <- end-start
+  stopCluster(cl)
+}
+avgP <- mean(times)
+
+times <- rep(NA,10)
+for(i in 1:10){
+  start <- Sys.time()
+  for (p in pseq){
+    sim <- tournament(p, 10000)
+    averages[which(averages$p == p),]$matches <- mean(sim$matches)
+    averages[which(averages$p == p),]$rate <- mean(sim$wins/sim$matches)
+  }  
+  end <- Sys.time()
+  times[i] <- end-start
+}
+avgNP <- mean(times)
