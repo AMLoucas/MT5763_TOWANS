@@ -67,13 +67,13 @@ registerDoParallel(cl)
 start <- Sys.time()
 averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
   sim <- tournament(p, 10000)
-  p <- p
   matches <-(mean(sim$matches))
   rate <- (mean(sim$wins/sim$matches))
   data.frame(p, matches, rate)
 }
 end <- Sys.time()
 end-start
+stopCluster(cl)
 
 # non parallelise 
 # run tournament
