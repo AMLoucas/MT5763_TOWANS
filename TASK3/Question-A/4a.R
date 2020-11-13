@@ -96,7 +96,7 @@ end <- Sys.time()
 end-start
 
 # Parallelise
-nCores <- 8 # no. of cores
+nCores <- detectCores() # no. of cores
 cl <- makeCluster(spec = nCores, type = "PSOCK")
 registerDoParallel(cl)
 
@@ -129,3 +129,59 @@ ggplot(sample_var_final) +
   xlab("Number of Monte Carlo simulations") +
   ylab("Variance of sample distribution") +
   ggtitle("Sample variance against number of simulations")
+
+
+
+
+
+# Test run times
+times <- rep(NA,10)
+
+for(i in 1:10){
+  
+start <- Sys.time()
+  for (k in nSim){
+    
+    # Simulate observed data
+    set.seed(45214)           # for reproducibility
+    x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
+    y <- runif(k,2,8)         # create the "observed" data for y
+    regData2 <- data.frame(x,y)
+    
+    # Bootstrapping to derive each sampling distribution
+    # for number of MC simulations with value k
+    sample_distri <- BootStrap(regData2,nBoot = 1000)
+    
+    # Store variance of sample distribution for this iteration
+    
+    sample_var_final[which(sample_var_final$number_of_simulations == k),]$variance <- var(sample_distri)
+  }
+  end <- Sys.time()
+  times[i] <- end-start
+}
+avgNP <- mean(times)
+
+
+# Parallelise
+times <- rep(NA,10)
+for (i in 1:10){
+  nCores <- detectCores() # no. of cores
+  cl <- makeCluster(spec = nCores, type = "PSOCK")
+  registerDoParallel(cl)
+  
+  start <- Sys.time()
+  sample_var_final <- foreach(k = nSim, .combine='rbind', .multicombine=TRUE) %dopar% {
+    set.seed(45214)           # for reproducibility
+    x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
+    y <- runif(k,2,8)         # create the "observed" data for y
+    regData2 <- data.frame(x,y)
+    sample_distri <- BootStrap(regData2,nBoot = 1000)
+    number_of_simulations <- k
+    variance <- var(sample_distri)
+    data.frame(number_of_simulations, variance)
+  }
+  end <- Sys.time()
+  times[i] <- end-start
+  stopCluster(cl)
+}
+avgP <- mean(times)
