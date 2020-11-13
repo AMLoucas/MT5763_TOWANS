@@ -59,7 +59,7 @@ tournament <- function(p = runif(1, min = 0, max = 1), NRepeat = 1) {
 pseq <- seq(0,1,0.01) # probability sequence
 
 # Parallelise
-nCores <- 8 # no. of cores
+nCores <- detectCores() # no. of cores
 cl <- makeCluster(spec = nCores, type = "PSOCK")
 registerDoParallel(cl)
 
@@ -128,7 +128,7 @@ ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probabi
 times <- rep(NA,10)
 for(i in 1:10){
   # Parallelise
-  nCores <- 8 # no. of cores
+  nCores <- detectCores() # no. of cores
   cl <- makeCluster(spec = nCores, type = "PSOCK")
   registerDoParallel(cl)
   
