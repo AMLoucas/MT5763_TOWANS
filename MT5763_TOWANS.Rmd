@@ -691,7 +691,9 @@ ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probabi
 The negative observed differences are as a result of the conclusions drawn from the previous plot. This plot highlights that fpr high assumed win rates, around [0.8, 0.99] the observed win rate is higher than the assumed win rate. The likely explanation for this is again down to the format of the tournament. At an assumed win rate of 1, a team will win every game, every time and end the tournament as a result of winning all 7 matches they play and so observed win rate = assumed win rate. However, for the higher assumed win rates that are still less than 1, it remains a possibility that a team will win close to, if not, all of their games. This will result in an observed win rate that is higher than the assumed rate.
 
 ### 4.3 Parallelisation 
-In order to make the code in this section as efficient as possible, the effect of parallelisation was considered when carrying out the Monte Carlo simulations for parts A and B. 
+In order to make the code in this section as efficient as possible, the effect of parallelisation was considered when carrying out the Monte Carlo simulations for parts A and B.
+
+In part A, to derive the relationship between sample variance and number of Monte Carlo simulations, each number between 5 and 200 was tested with a 1000 sample bootstrap being carried out for each one. By finding the average time to complete each process (parallelised or non-parallelised) over 10 repeats, the following results were obtained.
 
 |     Method       | Average Time Taken (seconds) | 
 |------------------|------------------------------|
@@ -699,20 +701,14 @@ In order to make the code in this section as efficient as possible, the effect o
 | Non-Parallelised |           18.66307           | 
 
 
-(100 probabilities, 10000 times each). The method was carried out using a parallelised and a non-parallelised method and the time taken for both methods to run were compared.
-
-The run time on the parallelised method was found to be consistently lower than the non-parallelised method, and so it was this method that was used within analyses. The table below shows the average run times for the two methods over 10 repeats, with the parallelised method running at almost 3 times faster than the non-parallelised method.
-
-
-
-
+In part B when testing the relationship between assumed win rate and observed win rate there were 100 assumed win rates, each running 10000 tournament simulations. By finding the average time to complete the parallelised and non-parallelised methods (over 10 runs) the following results were obtained.
 
 |     Method       | Average Time Taken (seconds) | 
 |------------------|------------------------------|
 | Parallelised     |           4.67162            | 
 | Non-Parallelised |          13.48815            | 
 
-
+The run time on the parallelised method was found to be consistently lower than the non-parallelised method for both processes, and so it was this method that was used within analyses. In both cases the parallelised method was found to be almost 3 times faster than its non-parallelised counterpart. 
 
 
 ## Conclusion
