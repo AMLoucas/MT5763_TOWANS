@@ -736,7 +736,7 @@ For the Jackknife task, we have created and implemented code for an efficient Ja
 For the final section, we used Monte Carlo simulations to investigate the sample variance of a given sampling distribution and consider the effects of a particular football tournament format. For **part A** we wound that the sample variance of the distribution was inversely related to the number of Monte Carlo simulations carried out. In **part B** we concluded that the particular tournament format allowed teams with expected win probability greater than 80% to win more than the expected proportion of games, and resulted in teams with lower expected win probabilities to win fewer than their expected proportion. Parallelisation was used in this task to reduce the time taken to run the Monte Carlo simulations. 
 
 ### Further Exploration
-While working through this project and the respective tools and methods, we have identified several further avenues of exploration, that could be of interest in the subsequent studies.
+While working through this project and the respective tools and methods, we have identified several further avenues of exploration, that could be of interest in subsequent studies.
 
 * **Shiny App:** There are almost infinite possibilities with regards to expanding the features of the US stock analyser Shiny app. In particular, one could add technical stock market indicators (such as On-Balance volume and accumulation/distribution lines) as well as other ratios and tools used by financial analysts.
 
