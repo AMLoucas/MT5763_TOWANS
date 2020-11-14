@@ -730,17 +730,17 @@ For the Shiny task, we have created a US Stock Analyser app. This Shiny app impo
 In the bootstrapping section we modified the regBoot algorithm in SAS and used the SURVEYSELECT procedure to create a much more efficient bootstrapping method, enabling us to efficiently calculate coefficients for a linear model. This new procedure was able to run 50,000 loops of the bootstrap in just 3.69 seconds instead of more than 23 minutes for the original code. Improving the efficiency of code, such as done in this task, is essential for statisticians. Efficient algorithms in research or industry are essential, as programmers often work with very large number bootstrap samples and may be constrained by computing power due budget limitations.
 
 #### Jackknife (SAS)
-For the Jackknife task, we have created and implemented code for an efficient Jackknife method, to estimate the standard error of the mean seal lengths for the data provided. Our method provided an identical result to the analytic estimate, with a run time of just 0.308s. As with the bootstrap example, such methods are being used and furtehr developed by statisticians around the world to make the computation of statistical estimates more effciient.
+For the Jackknife task, we have created and implemented code for an efficient Jackknife method, to estimate the standard error of the mean seal lengths for the data provided. Our method provided an identical result to the analytic estimate, with a run time of just 0.308s. As with the bootstrap example, such methods are being used and further developed by statisticians around the world to make the computation of statistical estimates more efficient.
 
 #### Monte Carlo Simulations (R)
-<!-- 2-3 sentences summarising findings and potential real world application-->
+For the final section, we used Monte Carlo simulations to investigate the sample variance of a given sampling distribution and consider the effects of a particular football tournament format. For **part A** we wound that the sample variance of the distribution was inversely related to the number of Monte Carlo simulations carried out. In **part B** we concluded that the particular tournament format allowed teams with expected win probability greater than 80% to win more than the expected proportion of games, and resulted in teams with lower expected win probabilities to win fewer than their expected proportion. Parallelisation was used in this task to reduce the time taken to run the Monte Carlo simulations. 
 
 ### Further Exploration
 While working through this project and the respective tools and methods, we have identified several further avenues of exploration, that could be of interest in the subsequent studies.
 
 * **Shiny App:** There are almost infinite possibilities with regards to expanding the features of the US stock analyser Shiny app. In particular, one could add technical stock market indicators (such as On-Balance volume and accumulation/distribution lines) as well as other ratios and tools used by financial analysts.
 
-* **Bootstrap:** It would be of interest to investigate how the updated bootstrapping procedure could be applied to more than 1 covariate and if it is possible to make it even more efficient when working with an extremely large numebr of loops.
+* **Bootstrap:** It would be of interest to investigate how the updated bootstrapping procedure could be applied to more than 1 covariate and if it is possible to make it even more efficient when working with an extremely large number of loops.
 
 * **Jackknife:** In our example the jackknife estimate was identical to the analytical estimate and we could investigate whether that holds for other datasets and variables, in particular those with non-standard distributions.
 
