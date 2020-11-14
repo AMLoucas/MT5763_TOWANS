@@ -40,16 +40,17 @@ This project was divided into 4 different sections. For the **Shiny App** sectio
 **Link to Shiny GitHub repository:** https://github.com/janfor1/MT5763_Shiny.git \
 **Link to Shiny App:** https://janforschner.shinyapps.io/mt5763_shiny/
 
-For the Shiny question in this project, we have created a **US Stock Analyser** app. This app gives a live overview of the stock market data for more than 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant market news. The app uses data from the free version of the Finnhub.io API (there is a limit of 50 API calls per minute).
+For this project, we have developed a **US Stock Analyser** Shiny app. This app gives a live overview of the stock market data for more 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant company news. The app uses data from the free version of the Finnhub.io API (limit of 50 API calls per minute).
 
 ### 1.1 Functionality
-The US Stock Analyser Shiny app uses relevant user inputs and API data to display corresponding stock and company data.
+The US Stock Analyser Shiny app we have created, takes relevant user inputs to import API data and display corresponding stock and company data.
 
-On the **server** side, *eventReactive* functions are used to access, load and manipulate relevant API data, before putting it into appropriate data frames. The reactive functions are designed such that they only re-run the code, if one of the corresponding inputs is modified or the data is refreshed (either using the Refresh button or the 1 hour refresh timer). We have also added relevant error messages for invalid inputs and missing data. In addition, the server includes the different *outputs* including Plotly plots (allowing for user interaction), HTML output for text displayed in the app, outputs for the value boxes and the download button functionality.
+The **`server.R`** file is responsible the main functionality of the app and is split into 2 sections. In the first section, `eventReactive` functions are used to access, load and manipulate relevant API data using the `httr::GET()` function, before putting it into appropriate data frames. The reactive functions are designed such that they only re-run the code, if one of the corresponding inputs is modified or the data is refreshed (either using the refresh button or the 1 hour refresh timer). The functions also contain relevant custom error messages that use the `validate` function to inform the user in case of invalid inputs or missing data. The second part of the server file contains the different `output` elements including Plotly (candlestick, time-series and analyst) graphs (`renderPlotly` function), HTML output (`renderUI` function) for text displayed in the app, outputs for the value boxes (`renderValueBox` function) and the download button functionality (`downloadHandler` function).
 
-In the **UI** document, we have included the inputs and UI elements as well as the main body output elements of the app. We have decided to use the dashboard layout (as opposed to the default layout), as this displays the data in a more effective way and also results in a better design. The sidebar includes relevant user inputs, the refresh and download button as well as help text for the data input. The main dashboard itself uses value boxes, normal dashboard boxes and tab boxes to display the different graphs and data output.
+In the **`ui.R`** file, we have included the inputs and UI elements as well as the main body output elements of the app. We have decided to use the dashboard layout (provided by the `shinydashboard` library), as this displays the data in a more effective way and also provides a better design. The sidebar includes relevant user inputs, the refresh and download button as well as help text for the data input. The Stock Name field makes use of the `selectizeInput` function to create a text input with a pre-determined list of compatible stock names. Meanwhile, the stock date range and resolution input controls are set up using the `dateRangeInput` and `selectInput` functions, respectively. Basic CSS tags have been used to format the buttons and text in the sidebar. The main dashboard itself is separated into different rows  using the `fluidRow` function. These contain the value boxes for current stock prices, standard dashboard boxes (using the `box` function) and tab boxes (using the `tabBox` function) to display the different graphs and HTML output.
 
-Finally, we have made use of the **global.R** document to make the server code cleaner and more concise. This file is responsible for loading all required packages, as well as defining functions for data wrangling and error messages that are used in the server file. The app also includes a **Readme.md** file as well as a **DESCRIPTION** file. The Readme.md file provides a brief description and instructions for using the app, while the DESCRIPTION file gives app details and allows for the app to be launched in Showcase Mode.
+Finally, we have made use of the **`global.R`** document to make the server code cleaner and more concise. This file is responsible for loading all required packages, as well as defining functions for data wrangling (making use of the `tidyverse` library) and error messages (for the API limit) that are used in the server file. In addition, the document contains the code that loads the list of all compatible stock names used for the Stock Name input text field. 
+The app also includes a **`Readme.md`** file as well as a **`DESCRIPTION`** file. The `Readme.md` file provides a brief description and instructions for using the app, while at the same time describing the contents and purpose of the different app files. The `DESCRIPTION` file on the other hand gives app details (such as title, author, etc.) and allows for the app to be launched in Showcase Mode.
 
 ### 1.2 Using the Shiny app
 
@@ -63,20 +64,20 @@ knitr::include_graphics("Shiny_Screenshots/Navbar.png")
 
 The sidebar is located on the left of the app dashboard and includes several data inputs and buttons as explained below. It can also be hidden by pressing the button (3 horizontal white lines) next to the app name.
 
-1. **Stock Name:** Stock name/ticker input field that accepts compatible US letter stock codes (such as AAPL, AMZN, GOOGL, etc.). The field shows suggestions for the 8000+ supported stocks as the user types and ensures only compatible names are entered.
-2. **Search Button:** The search button is used to confirm the stock selection on the *Stock Name* field and load the relevant data.
+1. **Stock Name:** Stock name/ticker input field that accepts compatible US letter stock codes (such as AAPL, AMZN, GOOGL, etc.). The field shows suggestions for the 8000+ supported stocks (using the `selectizeInput` function) as the user types and ensures only compatible names are entered.
+2. **Search Button:** The search button is a standard `actionButton` and is used to confirm the stock selection in the *Stock Name* field and load the relevant data.
 3. **NASDAQ Stock Names:** This button opens a list of NASDAQ listed companies with their respective stock names in a new tab.
-4. **Stock Date Range:** The date range selector allows the x-axis (date/time) limits for the candlestick plot and the Time-Series plot to be selected.
-5. **Resolution:** Here the user can select the resolution for the candlestick plot and the Time-Series plot (i.e. the time intervals for which the financial data is downloaded and shown), ranging from 1 minute to 1 month. The note below the input field, details the limitations for certain time frames and resolutions.
+4. **Stock Date Range:** The date range selector allows the x-axis (date/time) limits for the candlestick plot and the time-series plot to be selected using the `dateRangeInput` function.
+5. **Resolution:** Here the user can select the resolution for the candlestick plot and the time-series plot (i.e. the time intervals for which the financial data is downloaded and shown), ranging from 1 minute to 1 month (uses `selectInput` function). The note below the input field, details the limitations for certain time frames and resolutions.
 6. **Refresh Button:** Users can press the refresh button to manually update all stock data and reload the relevant output. In addition, there is a 1 hour refresh timer, that automatically refreshes the data every hour.
 7. **Last Updated Info:** The text below the *Refresh Button* indicates the last time that stock data has been updated.
-8. **Download Stock Data Button:** Pressing this button will download stock data (time/date, open, close, low, high) as a csv file for the currently selected stock, date range and resolution.
+8. **Download Stock Data Button:** Pressing this button will download stock data (time/date, open, close, low, high) as a csv file for the currently selected stock, date range and resolution (uses `downloadButton` function).
 
 There are restrictions on the date range and resolutions that are explained in the sidebar. In particular, resolutions smaller than 1 day are not available for 2019 and earlier and the date range for such graphs is limited to a maximum of 3 months. Also, it should be noted that the resolution must be smaller than the selected date range (i.e. if 1 day of data is selected a resolution of 1 month will return an error) and that the end date must be after the start date. If the input values are invalid or violate these rules, custom error messages will be shown informing the user.
 
 #### Dashboard
 
-The US Stock Analyser dashboard is the section of the app, where all relevant data is displayed. The individual outputs are explained here.
+The US Stock Analyser dashboard is the section of the app where all relevant data is displayed. The individual outputs are explained here.
 
 ```{r, echo=FALSE, fig.align='center',  out.width="95%", out.height="95%", fig.cap="FIGURE 1.2: Screenshot of the top section of the app dashboard showing live stock quotes and stock plots in a tab box."}
 knitr::include_graphics("Shiny_Screenshots/DashboardP1.png")
@@ -101,7 +102,7 @@ Given API limitations, not all data shown will be available for all stocks. In p
 
 ### 1.3 Summary
 
-The US Stock Analyser Shiny app uses API data and user inputs (stock name, date range and resolution) to display current stock quotes, stock price charts, analyst predictions and recommendations as well as company data and news. The plot are interactive, allowing user to see details for individual data points. In addition, the app has a refresh (button and automatic hourly refresh) and download functionality. Relevant explanations and error messages help the user to select adequate inputs and interpret the displayed outputs.
+The US Stock Analyser Shiny app uses API data and user inputs (stock name, date range and resolution) to display current stock quotes, stock price charts, analyst predictions and recommendations as well as company data and news. The plots are interactive, allowing user to see details for individual data points. In addition, the app has a refresh (button and automatic hourly refresh) and download functionality. Relevant explanations and error messages help the user to select adequate inputs and interpret the displayed outputs.
 
 
 ## 2. SAS BootStrap Implementation
