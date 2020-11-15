@@ -135,6 +135,8 @@ PROC SURVEYSELECT
 RUN;
 ```
 
+The field seed allows us to create a reproducible code. This mechanism helps us achieve the same results every time we run our code. 
+
   * **We did not use a loop to accomplish our N re-sampling simulations.** 
 
 In the code provided the different simulations for the bootstrap are computed with a "for loop". This is not a good approach, because the algorithm needs to re-sample the data for every loop for the total number of simulations N. A more efficient approach is to compute all the bootstrap simulations in advance and apply the computation to the dataset at once. In the updated code, we have computed all N bootstrap simulations using the built-in SAS function `SURVEYSELECT`. The name of the argument is `rep = <placeholder>`, where we assigned `rep` the number of bootstrap re-sampling datasets we want to construct.
@@ -197,6 +199,7 @@ The "regBootUpdated" is the modified and more efficient bootstrap.
 |  20000 	| 0:08:42.88 	|   0:00:01.53   	|
 |  50000 	| 0:23:31.36 	|   0:00:03.69   	|
 | 100000 	|    NULL    	|   0:00:07.79   	|
+Table: Table 2.2.1. Results of regBoot and regBootUpdated runt times.
 
 From the table with the recorded times, we can conclude that the updated version (regBootUpdated)
 is indeed more efficient. There are huge differences in the run-times, especially for very large values of N.  For instance, the supplied bootstrap took 23 minutes to execute N = 50000 iterations, while the updated version needed only 3.69 seconds. 
@@ -220,12 +223,12 @@ RUN;
 ```
 Below are the 95% confidence intervals for the origianl (non-bootstrap) data, for the regBoot data and for the reBootUpdated data. 
 
-**95% Confidence Intervals from regBootUpdated** 
 
 | CI    | RandomSlope | RandomIntercept |
 |:----: |:-----------:|:---------------:|
 | 2.5%  |   1.827   	|     75.273    	|
 | 97.5% |   2.225   	|    119.007  	  |
+Table: Table 2.3.1. 95% Confidence Interval Resutls of regBootUpdated
 
 ```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%", fig.cap="FIGURE 2.1: Histogram that plots parameter estimates for the Intercept variable obtained from regBootUpdated. "}
 # All defaults
@@ -237,12 +240,12 @@ include_graphics("TASK1/Intercept-estimate-regUpdate.png")
 include_graphics("TASK1/Slope-estimate-regUp.png")
 ```
 
-**95% Confidence Intervals from regBoot** 
 
 | CI    | RandomSlope | RandomIntercept |
 |:----: |:----------:	|:---------------:|
 | 2.5%  |   1.869   	|     79.696     	|
 | 97.5% |   2.189   	|    114.162   	  |
+Table: Table 2.3.2. 95% Confidence Interval Resutls of regBoot
 
 ```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%", fig.cap="FIGURE 2.3: Histogram that plots parameter estimates for the Intercept variable obtained from regBoot. "}
 # All defaults
@@ -255,15 +258,14 @@ include_graphics("TASK1/Sope-Intercept.png")
 ```
 
 
-**95% Confidence Intervals from built-in SAS function [PROC GLM]** 
-
 | CI    | RandomSlope | RandomIntercept | 
 |:----: |:-----------:|:---------------:|
 | 2.5%  | 1.85587676  |   76.20812857   |
 | 97.5% | 2.21572709  |   116.09872724  |
+Table: Table 2.3.3. 95% Confidence Intervals Results from built-in SAS function [PROC GLM]
 
 
-Our estimated values from the original data without bootstrap sampling for intercept and slope are *96.153* and *2.036*, respectively. We can see that the confidence intervals from Bootstrap algorithms contain these values and that they are approximately located in the middle of both of the histograms. This indicates our bootstrap results provide a "good" approximation. Additionally we notice that the 95% confidence intervals for all 3 methods differ in values and width. The reason for this phenomenon is that the estimates and confidence intervals are dependent on the data. For our original data without bootstrap, the values will always be the same, but for the bootstrap methods the values will always change. This is due to the fact that every time we run the re-sampling software, new random sample data is constructed, resulting in different results of our estimates and confidence intervals. In general, both codes do the same procedure, the only difference is that regBootUpdated does it in a more efficient way. To obtain more precise confidence intervals, you will have to increase the number of simulations *N*. The larger the value of *N* the closer our confidence intervals will be to the true parameter.
+Our estimated values from the original data without bootstrap sampling for intercept and slope are *96.153* and *2.036*, respectively. We can see that the confidence intervals from Bootstrap algorithms contain these values and that they are approximately located in the middle of both of the histograms. This indicates our bootstrap results provide a "good" approximation. Additionally we notice that 95% confidence intervals for all 3 methods differ in values and width. The reason for this phenomenon is that the estimates and confidence intervals are dependent on the data. For our original data without bootstrap, the values will always be the same, but for a bootstrap method the values will always change. In regBootUpdated we set a seed to create reproducible result, resulting to obtaining the same values every time. But for regBoot no seed was installed and these causes different results with every run. This is due to the fact that every time we run the re-sampling software, new random sample data is constructed, resulting in different results of our estimates and confidence intervals. With the results we obtained for now, the regBoot code obtained narrower confidence intervals compared to regBootUpdated. In general, both codes do the same procedure, the only difference is that regBootUpdated does it in a more efficient way. To obtain more precise confidence intervals, you will have to increase the number of simulations *N*. The larger the value of *N* is, the closer our confidence intervals will be to the true parameter.
 
 
 ## 3 Jackknife (SAS)
