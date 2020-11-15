@@ -563,14 +563,14 @@ ggplot(sample_var_final) +
 
 ```
 
-From the graph above, we can see that there seems to be a linear relation between the sample variance and inverse of number of Monte Carlo simulation.
+From the graphs above, we can see that there seems to be a linear relation between the sample variance and inverse of number of Monte Carlo simulation.
 
 
 #### Problem-B 
 This problem considers a football tournament where a team keeps playing until they accrue 7 wins **or** 3 losses, with no draws allowed.
 
 ### 4.2.1 Tournament Simualtion Construction
-To allow for simulation of results from the tournament detailed above, a "tournament" function was designed and implemented. The function takes win rate (p), which is fixed across all rounds, as an input and unless specified will take a randomly generated p ∈ [0, 1]. The function simulates the results of the tournament for a specified number of replicates, and stores the total number of wins, losses, matches played and the probability used in the simulation(s), returning them as a list in the output.
+To allow for simulation of results from the tournament detailed above, a "tournament" function was designed and implemented. The function takes win rate (p), which is fixed across all rounds, as an input and unless specified will take a randomly generated p ∈ [0, 1]. The function simulates the results of the tournament for a specified number of replicates, and stores the total number of wins, losses, matches played and the assumed win rate (p) used in the simulation(s), returning them as a list in the output.
 
 ``` {r}
 # function takes fixed p between 0 and 1 and 1 replicate as default 
@@ -676,10 +676,10 @@ ggplot(averages, aes(x = p, y = rate)) +     # plot win rate against probability
   scale_y_continuous(breaks = seq(0,1,0.1))
 
 ```
-From the plot is can be seen that only at very low probabilities and at high probabilities does the expected data fit as would be expected, with the observed win rate being lower than the assumed win rate for values within the region of around [0.01, 0.85] and appearing to be slightly higher within the region of around [0.87, 0.98]. Given that the structure of the tournament is such that losses are "favoured" since a team must accrue over twice as many wins as losses for the tournament to end as a result of wins, it is more likely that a teams stop playing as a result of losses. This means that for lower assumed win rates, teams will be losing more games than they are winning and the tournament will likely be stopped based on number of losses. As assumed win rate increases, the observed win rate increases closer to the assumed rate as teams should be winning more games and have more chance of ending the tournament as a result of accruing 7 wins. Despite this increase, the observed win rate will likely stay below the assumed win rate since although teams with p > 0.5 should expect to win more games than they lose, they can only play more games if the team stays below the 3 losses threshold, and so even if a team over 10 games was to win 7 and lose 3, such is the structure of the tournament that losses occurring before the wins will minimise the observed win rate.
+From the plot is can be seen that only at very low probabilities and at high probabilities does the observed data fit as would be expected, with the observed win rate being lower than the assumed win rate for values within the region of around [0.01, 0.85] and appearing to be slightly higher within the region of around [0.87, 0.98]. Given that the structure of the tournament is such that losses are "favoured" since a team must accrue over twice as many wins as losses for the tournament to end as a result of wins, it is more likely that a teams stop playing as a result of losses. This means that for lower assumed win rates, teams will be losing more games than they are winning and the tournament will likely be stopped based on number of losses. As assumed win rate increases, the observed win rate increases closer to the assumed rate as teams should be winning more games and have more chance of ending the tournament as a result of accruing 7 wins. Despite this increase, the observed win rate will likely stay below the assumed win rate since although teams with p > 0.5 should expect to win more games than they lose, they can only play more games if the team stays below the 3 losses threshold, and so even if a team over 10 games was to win 7 and lose 3, such is the structure of the tournament that losses occurring before the wins will minimise the observed win rate.
 
 To gain a better understanding of behavior at high assumed win rates, the following plot was created of the observed differences between the assumed win rates and the observed win rates, varying across p.
-```{r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Plot showing how the observed difference in win rate  varies with assumed win rate. Each point represents the observed difference for each p (observed win rate - assumed win rate"}
+```{r, echo = FALSE, message = FALSE, fig.align = "center", fig.cap = "Figure 4.2.3: Plot showing how the observed difference in win rate  varies with assumed win rate. Each point represents the observed difference for each p (observed win rate - assumed win rate)"}
 
 ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probability
   geom_point() +
@@ -690,7 +690,7 @@ ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probabi
 
 
 ```
-The negative observed differences are as a result of the conclusions drawn from the previous plot. This plot highlights that fpr high assumed win rates, around [0.8, 0.99] the observed win rate is higher than the assumed win rate. The likely explanation for this is again down to the format of the tournament. At an assumed win rate of 1, a team will win every game, every time and end the tournament as a result of winning all 7 matches they play and so observed win rate = assumed win rate. However, for the higher assumed win rates that are still less than 1, it remains a possibility that a team will win close to, if not, all of their games. This will result in an observed win rate that is higher than the assumed rate.
+The negative observed differences are as a result of the conclusions drawn from the previous plot. This plot highlights that for high assumed win rates, around [0.8, 0.99] the observed win rate is higher than the assumed win rate. The likely explanation for this is again down to the format of the tournament. At an assumed win rate of 1, a team will win every game, every time and end the tournament as a result of winning all 7 matches they play and so observed win rate = assumed win rate. However, for the higher assumed win rates that are still less than 1, it remains a possibility that a team will win close to, if not, all of their games. This will result in an observed win rate that is higher than the assumed rate.
 
 ### 4.3 Parallelisation 
 In order to make the code in this section as efficient as possible, the effect of parallelisation was considered when carrying out the Monte Carlo simulations for parts A and B.
