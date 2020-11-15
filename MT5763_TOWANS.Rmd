@@ -12,7 +12,9 @@ library(doParallel)
 library(parallel)
 library(tidyverse)
 ```
-
+<style>
+div.white pre { background-color:white; }
+</style>
 
 #### General GitHub repository: [https://github.com/AMLoucas/MT5763_TOWANS](https://github.com/AMLoucas/MT5763_TOWANS)
 
@@ -387,6 +389,7 @@ OPTIONS NONOTES;
 
 We also wrote the following SAS program in order to calculate the analytical estimate for standard error of mean length of the seals.
 
+<div class = "white">
 ```{eval = FALSE}
 %MACRO SE(Datafile, X);
 
@@ -400,7 +403,7 @@ RUN;
 /* Calling function */
 %SE(WORK.SEALS, Lengths)
 ```
-
+</div>
 We then ran the following code in order to compare the efficiency of our two processes.
 
 ```{eval=FALSE}
