@@ -703,7 +703,7 @@ In part A, to derive the relationship between sample variance and number of Mont
 |------------------|------------------------------|
 | Parallelised     |           6.947466           | 
 | Non-Parallelised |           18.66307           | 
-
+Table: Table 4.3.1. Effect of parallelisation on part A
 
 In part B when testing the relationship between assumed win rate and observed win rate there were 100 assumed win rates, each running 10000 tournament simulations. By finding the average time to complete the parallelised and non-parallelised methods (over 10 runs) the following results were obtained.
 
@@ -711,6 +711,7 @@ In part B when testing the relationship between assumed win rate and observed wi
 |------------------|------------------------------|
 | Parallelised     |           4.67162            | 
 | Non-Parallelised |          13.48815            | 
+Table: Table 4.3.2. Effect of parallelisation on part B
 
 The run time on the parallelised method was found to be consistently lower than the non-parallelised method for both processes, and so it was this method that was used within analyses. In both cases the parallelised method was found to be almost 3 times faster than its non-parallelised counterpart. 
 
