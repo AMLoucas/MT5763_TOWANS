@@ -1,7 +1,7 @@
 /* MT5763 Group Project */
 /* code for doing jackknife estimation */
-
-FILENAME REFILE '/folders/myfolders/sasuser.v94/seals.csv';
+%web_drop_table(WORK.SEALS);
+FILENAME REFFILE '/folders/myfolders/sasuser.v94/seals.csv';
 
 PROC IMPORT DATAFILE=REFFILE
 	DBMS=CSV
@@ -11,7 +11,7 @@ RUN;
 
 PROC CONTENTS DATA=WORK.SEALS;
 RUN;
-
+%web_open_table(WORK.SEALS);
 
 /*Jackknife Function
 	INPUTS
@@ -48,9 +48,9 @@ DATA VecJack / VIEW = VecJack;
 SET VecLong;
 if replicate=mod(_n_,&SIZE.)+1 then delete;
 RUN;
- 
+
 /*obtain the mean of each jackknifed sample*/
-PROC UNIVARIATE data=VecJack noprint; 
+PROC UNIVARIATE DATA=VecJack noprint; 
 VAR &X;
 BY replicate;
 OUTPUT out=jackMeans mean=mean;
@@ -81,7 +81,7 @@ RUN;
 OPTIONS NONOTES;
 
 /* Calling function */
-%jackKnife(WORK.SEALS, Lengths)
+%jackKnife(SEALS, Lengths)
 
 %MACRO SE(Datafile, X);
 
@@ -98,17 +98,17 @@ RUN;
 %MEND;
 
 /* Calling function */
-%SE(WORK.SEALS, Lengths)
+%SE(SEALS, Lengths)
 
 %MACRO loopjack(N);
 %do i=1 %to &N;
-%Jackknife(WORK.SEALS, Lengths);
+%Jackknife(SEALS, Lengths);
 %end;
 %mend;
 
 %MACRO loopSE(N);
 %do i=1 %to &N;
-%SE(WORK.SEALS, Lengths);
+%SE(SEALS, Lengths);
 %end;
 %mend;
 
