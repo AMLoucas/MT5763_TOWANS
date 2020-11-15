@@ -108,6 +108,7 @@ The US Stock Analyser Shiny app uses API data and user inputs (stock name, date 
 ## 2. SAS BootStrap Implementation
 
   For this exercise we were provided with a very inefficient bootstrap code. We had to modify the code in pursuing a more efficient bootstrap algorithm. To achieve this, we applied 4 main changes that optimised our bootstrap code and made it more efficient. 
+  The full code of regBootUpdated together with csv data import commands can be found in `APPENDIX`.
  
 #### 2.1 Main changes applied
 
@@ -199,7 +200,7 @@ The "regBootUpdated" is the modified and more efficient bootstrap.
 |  20000 	| 0:08:42.88 	|   0:00:01.53   	|
 |  50000 	| 0:23:31.36 	|   0:00:03.69   	|
 | 100000 	|    NULL    	|   0:00:07.79   	|
-Table: Table 2.2.1. Results of regBoot and regBootUpdated runt times.
+Table: Table 2.2.1. Results of regBoot and regBootUpdated run times.
 
 From the table with the recorded times, we can conclude that the updated version (regBootUpdated)
 is indeed more efficient. There are huge differences in the run-times, especially for very large values of N.  For instance, the supplied bootstrap took 23 minutes to execute N = 50000 iterations, while the updated version needed only 3.69 seconds. 
@@ -228,7 +229,7 @@ Below are the 95% confidence intervals for the origianl (non-bootstrap) data, fo
 |:----: |:-----------:|:---------------:|
 | 2.5%  |   1.827   	|     75.273    	|
 | 97.5% |   2.225   	|    119.007  	  |
-Table: Table 2.3.1. 95% Confidence Interval Resutls of regBootUpdated
+Table: Table 2.3.1. 95% Confidence Interval Results of regBootUpdated
 
 ```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%", fig.cap="FIGURE 2.1: Histogram that plots parameter estimates for the Intercept variable obtained from regBootUpdated. "}
 # All defaults
@@ -245,7 +246,7 @@ include_graphics("TASK1/Slope-estimate-regUp.png")
 |:----: |:----------:	|:---------------:|
 | 2.5%  |   1.869   	|     79.696     	|
 | 97.5% |   2.189   	|    114.162   	  |
-Table: Table 2.3.2. 95% Confidence Interval Resutls of regBoot
+Table: Table 2.3.2. 95% Confidence Interval Results of regBoot
 
 ```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%", fig.cap="FIGURE 2.3: Histogram that plots parameter estimates for the Intercept variable obtained from regBoot. "}
 # All defaults
@@ -257,6 +258,20 @@ include_graphics("TASK1/Intercept-estimate.png")
 include_graphics("TASK1/Sope-Intercept.png")
 ```
 
+We also estimated the parameter estimates and confidence intervals for the original data. We fitted one regression model on the original data using `PROC GLM`, the results of these command provides us with the estimates and the confidence intervals. 
+
+```{eval=FALSE}
+
+/* FITTING THE GLM MODEL WITH PROC GLM AND OBTAINING ALL THE ESTIMATES WE NEEDED */
+PROC GLM DATA = WORK.SEALS PLOTS = diagnostics; 
+  Model Testosterone=Lengths/ SOLUTION CLPARM;
+  ODS OUTPUT FitStatistics = modelFit ParameterEstimates = parEsts;
+  /* ASKING FOR THE CONFIDENCE INTERVAL RESULTS */
+  OUTPUT OUT = WORK.ESTIMATE_RESULT P = yhat R = resid LCLM = lowerCI UCLM = upperCI;; 
+RUN; 
+QUIT;
+
+```
 
 | CI    | RandomSlope | RandomIntercept | 
 |:----: |:-----------:|:---------------:|
