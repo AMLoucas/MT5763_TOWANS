@@ -561,15 +561,17 @@ stopCluster(cl)
 
 ```
 
-```{r, echo = FALSE, message = FALSE, fig.show="hold", out.width="50%", fig.cap = "Figure 4.1.2: (LEFT) Plot of sample variance against inverse number of Monte Carlo simulations. Each point represents the sample variance for 1/n Monte Carlo Simulations. Overlain is a fitted linear model to the data, highlighting the relationship. (RIGHT) Plot of sample variance against number of Monte Carlo simulations. Each point represents the sample variance for n Monte Carlo Simulations. Overlain is a fitted model to the data, highlighting the relationship"}
+```{r, echo = FALSE, message = FALSE, fig.show="hold", out.width="50%", fig.cap = "Figure 4.1.2: (LEFT) Plot of inverse sample variance against number of Monte Carlo simulations. Each point represents the inverse sample variance for n Monte Carlo Simulations. Overlain is a fitted linear model to the data, highlighting the relationship. (RIGHT) Plot of sample variance against number of Monte Carlo simulations. Each point represents the sample variance for n Monte Carlo Simulations. Overlain is a fitted model to the data, highlighting the relationship"}
+# build the linear model for inverse sample variance and number of MC simulations
+mdl <- lm(1/variance ~ number_of_simulations, data = sample_var_final)
 
 # Plot the graph of variance against number of simulations
 ggplot(sample_var_final) +
-  geom_point(aes(x = 1/number_of_simulations, y = variance), colour = "orange") +
-  geom_smooth(aes(x = 1/number_of_simulations,y = variance), method = "lm", se = FALSE) +
-  xlab("Inverse number of Monte Carlo simulations") +
-  ylab("Variance of sample distribution") +
-  ggtitle("Sample variance against number of simulations")
+  geom_point(aes(x = number_of_simulations, y = 1/variance), colour = "orange") +
+  xlab("Number of Monte Carlo simulations") +
+  ylab("Inverse variance of sample distribution") +
+  ggtitle("Precision against number of simulations") +
+  geom_abline(aes(intercept=mdl$coefficients[1],slope=mdl$coefficients[2]))
 
 ggplot(sample_var_final) +
   geom_point(aes(x = number_of_simulations, y = variance), colour = "orange") +
@@ -577,10 +579,9 @@ ggplot(sample_var_final) +
   xlab("Number of Monte Carlo simulations") +
   ylab("Variance of sample distribution") +
   ggtitle("Sample variance against number of simulations")
-
 ```
 
-From the graphs above, we can see that there seems to be a linear relation between the sample variance and inverse of number of Monte Carlo simulation.
+From the graph above, we can see that there seems to be a linear relation between the inverse sample variance and number of Monte Carlo simulation.
 
 
 ### 4.2 Problem B 
