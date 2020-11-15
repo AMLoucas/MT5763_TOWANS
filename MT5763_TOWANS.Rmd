@@ -107,13 +107,13 @@ The US Stock Analyser Shiny app uses API data and user inputs (stock name, date 
 
 ## 2. SAS BootStrap Implementation
 
-  In this exercise question we were provided a not very efficient bootstrap code. We had to modify the code in pursuing a more efficient bootstrap algorithm. We applied 4 main changes that optimized and made our bootstrap code more efficient. 
+  For this exercise we were provided with a very inefficient bootstrap code. We had to modify the code in pursuing a more efficient bootstrap algorithm. To achieve this, we applied 4 main changes that optimised our bootstrap code and made it more efficient. 
  
 #### 2.1 Main changes applied
 
  * **We did not manually compute the number of rows of the original dataset.** 
 
-When applying the simulation, we want our sample data to have the same number rows as the original dataset. In the provided code the number of rows are obtained using the code below: 
+When performing the bootstrap, we want our sample data to have the same number of rows as the original dataset. In the provided code the number of rows is obtained using the procedure below:
 ```{eval=FALSE}
 /*Number of rows in my dataset*/
  	data _null_;
@@ -122,14 +122,14 @@ When applying the simulation, we want our sample data to have the same number ro
  	stop;
  	run;
 ```
-In the updated version, we do not use this approach. The in-built SAS function surveyselect supplies a field/method that automatically computes the number of rows of the dataset you are applying re-sampling on. The method name is "SAMPRATE = <placeholder> ". By assigning the value 1 or 100 in the placeholder's position, the number of rows will be computed for you. 
+In the updated version, we do not use this approach. Instead, the built-in SAS function `SURVEYSELECT` supplies a method that automatically computes the number of rows of the dataset that we are re-sampling. The argument name is `SAMPRATE = <placeholder>`. By assigning the value 1 or 100 in the placeholder's position, the correct number of rows will be computed automatically.
 ```{eval=FALSE}
 PROC SURVEYSELECT 
 	data=&DataFile
 	out=WORK.bootData seed=23434
-	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
-	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
-	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
+	/* SAMPRATE = AUTOMATICALLY FINDS THE SIZE OF THE OBSERVATION SETS FOR EACH RE-SAMPLING */
+	/* REP = THE NUMBER OF TIMES WE WANT THE SIMULATION TO RUN */
+	/* METHOS = DEFINES METHOD FOR CREATING THE SAMPLE (RANDOM UNIFORM METHOD IN THIS CASE) */
 	/* OUTHITS = ENSURES EACH RECORD IS SAVED, RATHER THAN JUST 1 SIMULATION */
 	method=urs noprint SAMPRATE=1 outhits rep=&SampleSet;
 RUN;
@@ -137,15 +137,15 @@ RUN;
 
   * **We did not use a loop to accomplish our N re-sampling simulations.** 
 
-In the code provided the different simulation of bootstrapping is computed with a "for loop" . This was not a good approach, because the algorithm would need to apply re-sampling for every loop, this was be repeated for our N number of simulations. A more efficient approach is to compute all the bootstrap simulations in advance and apply the computation on the dataset at once. We computed all our N bootstrap simulations using a  the in-built SAS function surveyselect. The name of the field/method is "rep = <placeholder> ", we assigned "rep" with the number of bootstrap re-sampling datasets we want to construct. 
+In the code provided the different simulations for the bootstrap are computed with a "for loop". This is not a good approach, because the algorithm needs to re-sample the data for every loop for the total number of simulations N. A more efficient approach is to compute all the bootstrap simulations in advance and apply the computation to the dataset at once. In the updated code, we have computed all N bootstrap simulations using the built-in SAS function `SURVEYSELECT`. The name of the argument is `rep = <placeholder>`, where we assigned `rep` the number of bootstrap re-sampling datasets we want to construct.
 ```{eval=FALSE}
 /* Bootstrap loop for simulating data */
 PROC SURVEYSELECT 
 	data=&DataFile
 	out=WORK.bootData seed=23434
-	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
-	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
-	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
+	/* SAMPRATE = AUTOMATICALLY FINDS THE SIZE OF THE OBSERVATION SETS FOR EACH RE-SAMPLING */
+	/* REP = THE NUMBER OF TIMES WE WANT THE SIMULATION TO RUN */
+	/* METHOS = DEFINES METHOD FOR CREATING THE SAMPLE (RANDOM UNIFORM METHOD IN THIS CASE) */
 	/* OUTHITS = ENSURES EACH RECORD IS SAVED, RATHER THAN JUST 1 SIMULATION */
 	method=urs noprint SAMPRATE=1 outhits rep=&SampleSet;
 RUN;
@@ -153,7 +153,7 @@ RUN;
 
  * **We did not fit the linear model 1-by-1 for each sample dataset.** 
 
-Because we used "rep", the sample dataset constructed was supplied with an extra column called "REPLICATE". This field holds an integer value that indicates in which re-sampling iteration the row/data belongs to. We could than apply a model for each re-sampled dataset at once, with no need to iterate through each dataset and fit a model 1-by-1. This was accomplished by the command line "BY REPLICATE". This would automatically divide the datasets with the replicate value and fit the regression model using each iterations values. 
+Because we used the `rep` argument, the sample dataset constructed was supplied with an extra column called "REPLICATE". This field holds an integer value that indicates which re-sampling iteration the row/data belongs to. We could then apply a model for each re-sampled dataset, with no need to iterate through each dataset and fit a model 1-by-1. This was accomplished by the argument `BY REPLICATE`. This automatically separates the datasets by the replicate value and fits the regression model using each iteration's value.
 ```{eval=FALSE}
 /* Create model for each loop/simulation */
 PROC REG data=WORK.bootData 
@@ -169,7 +169,7 @@ QUIT;
 
  * **We did not append our estimates results 1-by-1 for each iteration.** 
  
-Since we used the "BY REPLICATE" command line, we had all our model results in one table at once.We extracted a subset from the fitted models result table that we were interested in one command line. We did not need to extract our fields of interest for each iteration and append it in a different table. 
+Since we used the `BY Replicate` argument, we obtained all model results together in one table. We extracted only the fitted model result that we were interested in (estimates for the intercept and slope) using the code below. We did not need to extract our fields of interest for each iteration and append it in a different table 1-by-1 as in the original code. 
 ```{eval=FALSE}
 /*Extract just the columns for slope and intercept for storage */
 DATA WORK.ESTIMATES;
@@ -179,12 +179,12 @@ DATA WORK.ESTIMATES;
 	RENAME Intercept=RandomIntercept &X=RandomSlope;	
 RUN;
 ```
-These were all the changes that were applied to modify the bootstrap algorithm and make it more efficient. We then ran simulation test with different number of N iterations. We used timers to calculate the time needed to execute the bootstrap function in isolation. 
+These were all the changes that were applied to modify the bootstrap algorithm and make it more efficient. We then ran bootstrapping tests for different numbers of iterations N. We used timers to calculate the time needed to execute the bootstrap function in isolation. 
 
 #### 2.2 Tests Run Results
 
-Below you can find the table that holds the different times for each N on both algorithm files. 
-The "regBootUpdated" is the modifies more effiecient bootstrap. 
+Below is a table that holds the different times for each N on both algorithm files. 
+The "regBootUpdated" is the modified and more efficient bootstrap.
 
 |    N   	|   regBoot  	| regBootUpdated 	|
 |:------:	|:----------:	|:--------------:	|
@@ -199,11 +199,11 @@ The "regBootUpdated" is the modifies more effiecient bootstrap.
 | 100000 	|    NULL    	|   0:00:07.79   	|
 
 From the table with the recorded times, we can conclude that the updated version (regBootUpdated)
-is indeed more efficient. The times have a huge difference, for the large values of N we can see a very big difference. The supplied bootstrap took 23 minutes to execute N = 50000, while the updated version needed only 3.69 seconds. 
+is indeed more efficient. There are huge differences in the run-times, especially for very large values of N.  For instance, the supplied bootstrap took 23 minutes to execute N = 50000 iterations, while the updated version needed only 3.69 seconds. 
  
 #### 2.3 Estimate Comparison
  
-In addition to making the algorithm more efficient, we had to compute the 95% Confidence intervals for the parameter estimates of interest. These values can be computed using the SAS in-built function of UNIVARIATE. We calculated the 95% confidence intervals from both programs. 
+In addition to making the algorithm more efficient, we were asked to compute the 95% confidence intervals for the parameter estimates of interest. These values can be computed using the built-in SAS function `UNIVARIATE`. We calculated the 95% confidence intervals for both programs. 
 ```{eval=FALSE}
 /* GET THE 95% CI of our estimates*/
 PROC UNIVARIATE 
@@ -218,7 +218,7 @@ PROC UNIVARIATE
 	OUTPUT out=WORK.SlopeCI pctlpts=2.5, 97.5 pctlpre=CI; /* 95% CI */
 RUN;
 ```
-Below you can find the 95% confidence intervals on the origianl (non-bootstrap) data, on the regBoot data and on the reBootUpdated data. 
+Below are the 95% confidence intervals for the origianl (non-bootstrap) data, for the regBoot data and for the reBootUpdated data. 
 
 **95% Confidence Intervals from regBootUpdated** 
 
@@ -263,7 +263,7 @@ include_graphics("TASK1/Sope-Intercept.png")
 | 97.5% | 2.21572709  |   116.09872724  |
 
 
-Our estimate values from the original data without bootstrap sampling are for Intercept *96.153* and for Slope *2.036* . We can see that the confidence intervals from Bootstrap algorithms contain the values and is approximately located in the middle of both of the histograms. This indicates our bootstrap results are "good". Additionally we notice that 95% confidence intervals for all 3 methods differ in values and width. The reason for this phenomeno is because the estimates and confidence intervals are dependent on there data. For our original data without bootstrap, the values will always be the same, but for the bootstrap methods the values will always change. This is due to the fact that every time we run the re-sampling software, new random sample data is constructed, resulting to different results of our estimates and confidence intervals. In general, both codes do the same procedure, the only difference is that regBootUpdated does it in a more efficient way. To obtain more precise confidence intervals, you will have to increase the number of simulations *N* . The larger the value of *N* the closer our confidence intervals will be to the true parameter. 
+Our estimated values from the original data without bootstrap sampling for intercept and slope are *96.153* and *2.036*, respectively. We can see that the confidence intervals from Bootstrap algorithms contain these values and that they are approximately located in the middle of both of the histograms. This indicates our bootstrap results provide a "good" approximation. Additionally we notice that 95% confidence intervals for all 3 methods differ in values and width. The reason for this phenomenon is that the estimates and confidence intervals are dependent on the data. For our original data without bootstrap, the values will always be the same, but for the bootstrap methods the values will always change. This is due to the fact that every time we run the re-sampling software, new random sample data is constructed, resulting in different results of our estimates and confidence intervals. In general, both codes do the same procedure, the only difference is that regBootUpdated does it in a more efficient way. To obtain more precise confidence intervals, you will have to increase the number of simulations *N*. The larger the value of *N* the closer our confidence intervals will be to the true parameter.
 
 
 ## 3 Jackknife (SAS)
