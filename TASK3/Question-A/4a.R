@@ -82,13 +82,13 @@ for (k in nSim){
   x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
   y <- runif(k,2,8)         # create the "observed" data for y
   regData2 <- data.frame(x,y)
-
+  
   # Bootstrapping to derive each sampling distribution
   # for number of MC simulations with value k
   sample_distri <- BootStrap(regData2,nBoot = 1000)
   
   # Store variance of sample distribution for this iteration
- 
+  
   sample_var_final[which(sample_var_final$number_of_simulations == k),]$variance <- var(sample_distri)
 }
 
@@ -112,13 +112,16 @@ sample_var_final <- foreach(k = nSim, .combine='rbind', .multicombine=TRUE) %dop
 
 stopCluster(cl)
 
+# build the linear model for inverse sample variance and number of MC simulations
+mdl <- lm(1/variance ~ number_of_simulations, data = sample_var_final)
+
 # Plot the graph of variance against number of simulations
 ggplot(sample_var_final) +
-  geom_point(aes(x = 1/number_of_simulations, y = variance), colour = "orange") +
-  geom_smooth(aes(x = 1/number_of_simulations,y = variance), method = "lm") +
-  xlab("Inverse number of Monte Carlo simulations") +
-  ylab("Variance of sample distribution") +
-  ggtitle("Sample variance against number of simulations")
+  geom_point(aes(x = number_of_simulations, y = 1/variance), colour = "orange") +
+  xlab("Number of Monte Carlo simulations") +
+  ylab("Inverse variance of sample distribution") +
+  ggtitle("Sample variance against number of simulations") +
+  geom_abline(aes(intercept=mdl$coefficients[1],slope=mdl$coefficients[2]))
 
 ggplot(sample_var_final) +
   geom_point(aes(x = number_of_simulations, y = variance), colour = "orange") +
@@ -136,7 +139,7 @@ times <- rep(NA,10)
 
 for(i in 1:10){
   
-start <- Sys.time()
+  start <- Sys.time()
   for (k in nSim){
     
     # Simulate observed data
