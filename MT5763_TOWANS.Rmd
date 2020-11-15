@@ -323,6 +323,11 @@ VAR &X;
 OUTPUT out=MEANX mean=sampmean;
 RUN;
 
+/*avoid warning in SAS by storing MEANX as non-output data*/
+DATA SAMPMEANSHORT;
+SET MEANX;
+RUN;
+
 /*need to acquire size of the dataset (n) to know how many replicates will be needed*/
 PROC SQL NOPRINT;
 SELECT count(*) into :size from &DataFile;
@@ -909,13 +914,18 @@ VAR &X;
 OUTPUT out=MEANX mean=sampmean;
 RUN;
 
+/*avoid warning in SAS by storing MEANX as non-output data*/
+DATA SAMPMEANSHORT;
+SET MEANX;
+RUN;
+
 /*need to acquire size of the dataset (n) to know how many replicates will be needed*/
 PROC SQL NOPRINT;
 SELECT count(*) into :size from &DataFile;
 QUIT;
     
 /*obtain a dataset which is the sample mean repeated n times for later calculation*/
-PROC SURVEYSELECT DATA=MEANX OUT=SAMPMEAN
+PROC SURVEYSELECT DATA=SAMPMEANSHORT OUT=SAMPMEAN
 method=srs samprate=1 rep=&SIZE. ;
 RUN;
 	
