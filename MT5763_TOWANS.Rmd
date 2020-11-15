@@ -224,8 +224,8 @@ Below are the 95% confidence intervals for the origianl (non-bootstrap) data, fo
 
 | CI    | RandomSlope | RandomIntercept |
 |:----: |:-----------:|:---------------:|
-| 2.5%  |   1.845   	|     74.942     	|
-| 97.5% |   2.228   	|    117.238   	  |
+| 2.5%  |   1.827   	|     75.273    	|
+| 97.5% |   2.225   	|    119.007  	  |
 
 ```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%", fig.cap="FIGURE 2.1: Histogram that plots parameter estimates for the Intercept variable obtained from regBootUpdated. "}
 # All defaults
@@ -781,7 +781,7 @@ RUN;
 /* Bootstrap loop for simulating data */
 PROC SURVEYSELECT 
 	data=&DataFile
-	out=WORK.bootData seed=-23434
+	out=WORK.bootData seed=23434
 	/* SAMPRATE = HELPS US NO NEED TO FIND THE OBSERVATION SETS SIZE. FINDS ITS FOR US */
 	/* REP = IS THE NUMBER OF TIMES YOU WANT THE SIMULATION TO OCCUR */
 	/* METHOS = IS TO CREATE THE SAMPLES IN RANDOM UNIFORM WAY */
