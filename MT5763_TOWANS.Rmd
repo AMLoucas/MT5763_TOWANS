@@ -441,10 +441,10 @@ Table: Table 3.3.1. Results of Jacknife Estimate for Error
 As we can see here our Jackknife process is slightly less efficient than calculating the standard error analytically. We found the exact same value for the standard error as the analytical method so we can infer that we have a reliable estimate. 
 
 
-## TASK-4 [Monte Carlo simulation (R)]
+## Monte Carlo simulation (R)
 The problems in task 4 involved writing efficient R code to solve two problems using Monte Carlo simulation.  Problem A explores distribution of random variables and Problem B explores the varying outcomes of a football tournament and the associated probabilities.
 
-#### Problem-A 
+### 4.1 Problem A 
 
 In this section, we use Monte Carlo simulation as well as bootstrapping to compute the probability of $X>Y$, with
 $X \sim N(\mu=4,\sigma^2=10)$, $Y \sim U(a=2,b=8)$ being two independent random variables, and derive the sample distribution for the estimated probability, and finally show the relation between sample variance and number of Monte Carlo simulations.
@@ -568,7 +568,7 @@ ggplot(sample_var_final) +
 From the graphs above, we can see that there seems to be a linear relation between the sample variance and inverse of number of Monte Carlo simulation.
 
 
-#### Problem-B 
+### 4.2 Problem B 
 This problem considers a football tournament where a team keeps playing until they accrue 7 wins **or** 3 losses, with no draws allowed.
 
 ### 4.2.1 Tournament Simualtion Construction
@@ -636,7 +636,7 @@ By first creating a sequence of win rates (p) from 0 to 1 in increments of 0.01 
 pseq <- seq(0,1,0.01) # probability sequence
 
 # Parallelise
-nCores <- 8 # no. of cores
+nCores <- detectCores() # no. of cores
 cl <- makeCluster(spec = nCores, type = "PSOCK")
 registerDoParallel(cl)
 
