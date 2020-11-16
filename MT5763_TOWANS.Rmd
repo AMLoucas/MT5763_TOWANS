@@ -1,5 +1,5 @@
 ---
-title: "MT5763_TOWANS"
+title: "Software for Data Analysis Project (Towans)"
 output:
   html_document: default
   fig_caption: yes
@@ -22,11 +22,11 @@ div.white pre { background-color:white; }
 
 ## Abstract
 
-This project is divided into 4 different sections. For the **Shiny App** section we created a US stock analyser that shows live US stock listings and prices in an interactive fashion. The app uses data from the Finnhub.io API, and allows the user to see changes in the stock over their chosen date range. It also displays information about the stock, recent news, and price targets. In the **Bootstrap** section we set out to create a more efficient version of the `regBoot` procedure in SAS. By making use of the `SURVEYSELECT` procedure and modifying other parts of the code, we were able to make the code significantly faster. For 100 loops, the new program executed in 0.04s as opposed to 2.44s for the old program, and the advantage held across a variety of loop sizes. For the **Jackknife** task our goal was to create efficient code for computing the jackknife estimate of the standard error of the mean of a variable. This was successful, as our macro produced the exact same result as the analytical estimate of the standard error for a dataset of seal lengths, and ran at an average of 0.308s per call. In the **Monte Carlo Simulation** section our goal was to use Monte Carlo simulations to investigate the sample variance of a particular sampling distribution, and consider the effects of a football tournament format. We discovered that the sample variance of the distribution was inversely related to the number of Monte Carlo simulations. For the football tournament we found that the format allowed teams with expected win probability above 80% to win more than the expected proportion of games, and caused teams with lower expected win probabilities to win fewer than their expected proportion. Parallelisation was successful in reducing the runtime of the Monte Carlo simulations.  
+This project is divided into 4 different sections. For the **Shiny App** section we created a US stock analyser that shows live US stock listings and prices in an interactive fashion. The app uses data from the Finnhub.io API, and allows the user to see changes in the stock over their chosen date range. It also displays information about the stock, recent news, and price targets. In the **Bootstrap** section we set out to create a more efficient version of the "regBoot" procedure in SAS. By making use of the `SURVEYSELECT` procedure and modifying other parts of the code, we were able to make the code significantly faster. For 100 loops, the new program executed in 0.04s as opposed to 2.44s for the old program, and the advantage held across a variety of loop sizes. For the **Jackknife** task our goal was to create efficient code for computing the jackknife estimate of the standard error of the mean of a variable. This was successful, as our macro produced the exact same result as the analytical estimate of the standard error for a dataset of seal lengths, and ran at an average of 0.308s per call. In the **Monte Carlo Simulation** section our goal was to use Monte Carlo simulations to investigate the sample variance of a particular sampling distribution, and consider the effects of a football tournament format. We discovered that the sample variance of the distribution was inversely related to the number of Monte Carlo simulations. For the football tournament we found that the format allowed teams with expected win probability above 80% to win more than the expected proportion of games, and caused teams with lower expected win probabilities to win fewer than their expected proportion. Parallelisation was successful in reducing the runtime of the Monte Carlo simulations.  
 
 ## Introduction
 
-  The overall purpose of this project is to display the programming skills acquired in SAS and R, while making use of version control through GIT to ensure proper documentation. We worked as a team to produce the deliverables for each task. There are 4 independent tasks that we worked to complete. 
+  The overall purpose of this project is to demonstrate the programming skills acquired in SAS and R, while making use of version control through GIT to ensure proper documentation. We worked as a team to complete and produce the deliverables for the following 4 independent tasks.
   
   For the **Shiny App** component, we decided as a group to create a Shiny application using a stock exchange API. The purpose here was to create a user-friendly API that updates each hour, or when the user presses a refresh button. The objectives in this task also included making the app as interactive as possible, and ensuring that the data was easily digestible for the user. 
   
@@ -34,7 +34,7 @@ This project is divided into 4 different sections. For the **Shiny App** section
   
   In the **Jackknife** section, our goal was to code a Jackknife algorithm for computing an estimate of the standard error of the sample mean, and then implement it on the seal length data. To confirm the method was successful, we then needed to compare our estimate with the analytical estimate. A secondary goal was to ensure that the code was efficient enough to run on larger data sets. 
 
-  For the **Monte Carlo Simulation** task, we had to code and implement two Monte Carlo Simulations using R. The purpose of one of the simulations was to derive a sampling distribution for the probability that a particular normal random variable was greater than a particular uniform random variable, and investigate how the sample variance of that distribution changed with respect to the number of simulations. The aim of the other simulation was to determine the effect of a football tournament format on the observed win rate of teams relative to their assumed win rate. A secondary objective in both tasks was to make use of parallel computation to ensure that the simulations ran efficiently or alternatively, show that parallel computation was not useful in this application.  
+  For the **Monte Carlo Simulation** task, we had to code and implement two Monte Carlo Simulations using R. The purpose of the first simulation (**part A**) was to derive a sampling distribution for the probability that a particular normal random variable was greater than a particular uniform random variable, and investigate how the sample variance of that distribution changed with respect to the number of simulations. The aim of the second simulation (**part B**) was to determine the effect of a football tournament format on the observed win rate of teams relative to their expected win rate. A secondary objective in both tasks was to make use of parallel computation to ensure that the simulations ran efficiently or alternatively, show that parallel computation was not useful in this application.  
 
 
 ## 1 Developing a Shiny App (R)
@@ -45,18 +45,18 @@ This project is divided into 4 different sections. For the **Shiny App** section
 For this project, we have developed a **US Stock Analyser** Shiny app. This app gives a live overview of the stock market data for more 8000 publicly listed US companies as well as additional analyst recommendations, organisation details and relevant company news. The app uses data from the free version of the Finnhub.io API (limit of 50 API calls per minute).
 
 ### 1.1 Functionality
-The US Stock Analyser Shiny app we have created, takes relevant user inputs to import API data and display corresponding stock and company data.
+The US Stock Analyser Shiny app we have created takes relevant user inputs to import API data and display corresponding stock and company data.
 
 The **`server.R`** file is responsible the main functionality of the app and is split into 2 sections. In the first section, `eventReactive` functions are used to access, load and manipulate relevant API data using the `httr::GET()` function, before putting it into appropriate data frames. The reactive functions are designed such that they only re-run the code, if one of the corresponding inputs is modified or the data is refreshed (either using the refresh button or the 1 hour refresh timer). The functions also contain relevant custom error messages that use the `shiny::validate()` function to inform the user in case of invalid inputs or missing data. The second part of the server file contains the different `output` elements including Plotly (candlestick, time-series and analyst) graphs (`renderPlotly` function), HTML output (`renderUI` function) for text displayed in the app, outputs for the value boxes (`renderValueBox` function) and the download button functionality (`downloadHandler` function).
 
-In the **`ui.R`** file, we have included the inputs and UI elements as well as the main body output elements of the app. We have decided to use the dashboard layout (provided by the `shinydashboard` library), as this displays the data in a more effective way and also provides a better design. The sidebar includes relevant user inputs, the refresh and download button as well as help text for the data input. The Stock Name field makes use of the `selectizeInput` function to create a text input with a pre-determined list of compatible stock names. Meanwhile, the stock date range and resolution input controls are set up using the `dateRangeInput` and `selectInput` functions, respectively. Basic CSS tags have been used to format the buttons and text in the sidebar. The main dashboard itself is separated into different rows  using the `fluidRow` function. These contain the value boxes for current stock prices, standard dashboard boxes (using the `box` function) and tab boxes (using the `tabBox` function) to display the different graphs and HTML output.
+In the **`ui.R`** file, we have included the inputs and UI elements as well as the main body output elements of the app. We have decided to use the dashboard layout (provided by the `shinydashboard` library), as this displays the data in a more effective way and also provides a better design. The sidebar includes relevant user inputs, the refresh and download buttons as well as help text for the data input. The Stock Name field makes use of the `selectizeInput` function to create a text input field with a pre-determined list of compatible stock names. Meanwhile, the stock date range and resolution input controls are set up using the `dateRangeInput` and `selectInput` functions, respectively. Basic CSS tags have been used to format the buttons and text in the sidebar. The main dashboard itself is separated into different rows  using the `fluidRow` function. These contain the value boxes for current stock prices, standard dashboard boxes (using the `box` function) and tab boxes (using the `tabBox` function) to display the different graphs and HTML output.
 
 Finally, we have made use of the **`global.R`** document to make the server code cleaner and more concise. This file is responsible for loading all required packages, as well as defining functions for data wrangling (making use of the `tidyverse` library) and error messages (for the API limit) that are used in the server file. In addition, the document contains the code that loads the list of all compatible stock names used for the Stock Name input text field. 
 The app also includes a **`Readme.md`** file as well as a **`DESCRIPTION`** file. The `Readme.md` file provides a brief description and instructions for using the app, while at the same time describing the contents and purpose of the different app files. The `DESCRIPTION` file on the other hand gives app details (such as title, author, etc.) and allows for the app to be launched in Showcase Mode.
 
 ### 1.2 Using the Shiny app
 
-The user can interact with the Shiny app in a variety of ways. The available data inputs as well as the outputs shown on the dashboard are explained in details below.
+The user can interact with the Shiny app in a variety of ways. The available data inputs as well as the outputs shown on the dashboard are explained in detail below.
 
 #### Sidebar
 
@@ -90,7 +90,7 @@ knitr::include_graphics("Shiny_Screenshots/DashboardP1.png")
 3. **Daily High:** Gives the maximum stock price for the day in USD (or previous trading day in case of bank holidays or weekends).
 4. **Candlestick Tab (default):** Displays an interactive candlestick chart for the chosen stock, date range and resolution. Hovering over individual data points will give relevant prices (open, close, high, low) for the given period. The slider controls underneath the x-axis can be used to manually adjust the date range shown.
 5. **Time-Series Tab:** Shows an interactive time-series graph for the selected stock, date range and resolution. Again hovering over the line will indicate the stock price at the different time intervals.
-6. **Analysis Tab:** If available, this provides an interactive bar chart of the analyst recommendations (stong sell, sell, hold, buy or stock buy) for the selected stock over the past 6 months. Hovering over the chart will give details for the individual months.
+6. **Analysis Tab:** If available, this provides an interactive bar chart of the analyst recommendations (stong sell, sell, hold, buy or strong buy) for the selected stock over the past 6 months. Hovering over the chart will give details for the individual months.
 
 ```{r, echo=FALSE, fig.align='center',  out.width="95%", out.height="95%", fig.cap="FIGURE 1.3: Screenshot of the lower section of the app dashboard showing company information and news as well as price targets."}
 knitr::include_graphics("Shiny_Screenshots/DashboardP2.png")
@@ -107,7 +107,7 @@ Given API limitations, not all data shown will be available for all stocks. In p
 The US Stock Analyser Shiny app uses API data and user inputs (stock name, date range and resolution) to display current stock quotes, stock price charts, analyst predictions and recommendations as well as company data and news. The plots are interactive, allowing user to see details for individual data points. In addition, the app has a refresh (button and automatic hourly refresh) and download functionality. Relevant explanations and error messages help the user to select adequate inputs and interpret the displayed outputs.
 
 
-## 2. SAS BootStrap Implementation
+## 2 SAS Bootstrap Implementation
 
   For this exercise we were provided with a very inefficient bootstrap code. We had to modify the code in pursuing a more efficient bootstrap algorithm. To achieve this, we applied 4 main changes that optimised our bootstrap code and made it more efficient. 
   The full code of regBootUpdated together with csv data import commands can be found in `APPENDIX`.
@@ -118,7 +118,7 @@ The US Stock Analyser Shiny app uses API data and user inputs (stock name, date 
 
 When performing the bootstrap, we want our sample data to have the same number of rows as the original dataset. In the provided code the number of rows is obtained using the procedure below:
 ```{eval=FALSE}
-/*Number of rows in my dataset*/
+/*Number of rows in the dataset*/
  	data _null_;
   	set &DataSet NOBS=size;
   	call symput("NROW",size);
@@ -138,7 +138,7 @@ PROC SURVEYSELECT
 RUN;
 ```
 
-The field seed allows us to create a reproducible code. This mechanism helps us achieve the same results every time we run our code. 
+The `seed` argument allows us to create reproducible code. This mechanism helps us achieve the same results every time we run our code. 
 
   * **We did not use a loop to accomplish our N re-sampling simulations.** 
 
@@ -172,7 +172,7 @@ RUN;
 QUIT;
 ```
 
- * **We did not append our estimates results 1-by-1 for each iteration.** 
+ * **We did not append our estimated results 1-by-1 for each iteration.** 
  
 Since we used the `BY Replicate` argument, we obtained all model results together in one table. We extracted only the fitted model result that we were interested in (estimates for the intercept and slope) using the code below. We did not need to extract our fields of interest for each iteration and append it in a different table 1-by-1 as in the original code. 
 ```{eval=FALSE}
@@ -260,7 +260,7 @@ include_graphics("TASK1/Intercept-estimate.png")
 include_graphics("TASK1/Sope-Intercept.png")
 ```
 
-We also estimated the parameter estimates and confidence intervals for the original data. We fitted one regression model on the original data using `PROC GLM`, the results of these command provides us with the estimates and the confidence intervals. 
+We also estimated the parameter estimates and confidence intervals for the original data. We fitted a regression model on the original data using `PROC GLM`, the results of this command provides us with the estimates and the confidence intervals. 
 
 ```{eval=FALSE}
 
@@ -282,7 +282,7 @@ QUIT;
 Table: Table 2.3.3. 95% Confidence Intervals Results from built-in SAS function [PROC GLM]
 
 
-Our estimated values from the original data without bootstrap sampling for intercept and slope are *96.153* and *2.036*, respectively. We can see that the confidence intervals from Bootstrap algorithms contain these values and that they are approximately located in the middle of both of the histograms. This indicates our bootstrap results provide a "good" approximation. Additionally we notice that the 95% confidence intervals for all 3 methods differ in values and width. The reason for this phenomenon is that the estimates and confidence intervals are dependent on the data. For our original data without bootstrap, the values will always be the same, but for a bootstrap method the values will always change. In regBootUpdated we set a seed to create reproducible result, so the same values are obtained every time. But for regBoot no seed was installed and this causes different results with every run. This is due to the fact that every time we run the re-sampling software, new random sample data is constructed, resulting in different results of our estimates and confidence intervals. With the results we obtained for now, the regBoot code obtained narrower confidence intervals compared to regBootUpdated. In general, both codes do the same procedure, the only difference is that regBootUpdated does it in a more efficient way. To obtain more precise confidence intervals, you will have to increase the number of simulations *N*. The larger the value of *N* is, the closer our confidence intervals will be to the true parameter.
+Our estimated values from the original data without bootstrap sampling for intercept and slope are *96.153* and *2.036*, respectively. We can see that the confidence intervals from the bootstrap algorithms contain these values and that they are approximately located in the middle of both of the histograms. This indicates our bootstrap results provide a "good" approximation. Additionally we notice that the 95% confidence intervals for all 3 methods differ in values and width. The reason for this phenomenon is that the estimates and confidence intervals are dependent on the data. For our original data without bootstrap, the values will always be the same, but for a bootstrap method the values will always change. In regBootUpdated we set a seed to create reproducible result, so the same values are obtained every time. But for regBoot no seed was installed and this causes different results with every execution. This is due to the fact that every time we run the re-sampling procedure, new randomly sampled data is constructed, resulting in different results of our estimates and confidence intervals. With the results we obtained for now, the regBoot code obtained narrower confidence intervals compared to regBootUpdated. In general, both codes perform the same procedure, the only difference is that regBootUpdated does it in a more efficient way. To obtain more precise confidence intervals, we would have to increase the number of simulations *N*. The larger the value of *N* is, the closer our confidence intervals will be to the true parameter.
 
 
 ## 3 Jackknife (SAS)
@@ -466,7 +466,7 @@ Table: Table 3.3.1. Results of Jacknife Estimate for Error
 As we can see here our Jackknife process is slightly less efficient than calculating the standard error analytically. We found the exact same value for the standard error as the analytical method so we can infer that we have a reliable estimate. 
 
 
-## Monte Carlo simulation (R)
+## 4 Monte Carlo simulation (R)
 The problems in task 4 involved writing efficient R code to solve two problems using Monte Carlo simulation.  Problem A explores distribution of random variables and Problem B explores the varying outcomes of a football tournament and the associated probabilities.
 
 ### 4.1 Problem A 
@@ -494,7 +494,7 @@ For N=1000, we got the estimated probability with value 0.401.
 
 ### 4.1.2 Sampling distribution
 
-We then use bootstrapping to derive the sampling distribution for the estimated probability of $X>Y$ and demonstrate it in a histogram. First we defined a function for bootstrapping.
+We then use bootstrapping to derive the sampling distribution for the estimated probability of $X>Y$ and demonstrate it in a histogram. First we define a function for bootstrapping.
 
 ```{r, message=FALSE}
 # create data
@@ -591,7 +591,7 @@ ggplot(sample_var_final) +
   ggtitle("Sample variance against number of simulations")
 ```
 
-From the graph above, we can see that there seems to be a linear relation between the inverse sample variance and number of Monte Carlo simulation.
+From the graph above, we can see that there seems to be a linear relation between the inverse sample variance and number of Monte Carlo simulations.
 
 
 ### 4.2 Problem B 
@@ -721,7 +721,7 @@ ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probabi
 The negative observed differences are as a result of the conclusions drawn from the previous plot. This plot highlights that for high assumed win rates, around [0.8, 0.99] the observed win rate is higher than the assumed win rate. The likely explanation for this is again down to the format of the tournament. At an assumed win rate of 1, a team will win every game, every time and end the tournament as a result of winning all 7 matches they play and so observed win rate = assumed win rate. However, for the higher assumed win rates that are still less than 1, it remains a possibility that a team will win close to, if not, all of their games. This will result in an observed win rate that is higher than the assumed rate.
 
 ### 4.3 Parallelisation 
-In order to make the code in this section as efficient as possible, the effect of parallelisation was considered when carrying out the Monte Carlo simulations for parts A and B.
+In order to make the code in this section as efficient as possible, the effect of parallelisation was considered when carrying out the Monte Carlo simulations for parts A and B. The functions used to perform the parallelisation are included in the full code given in the appendix.
 
 In part A, to derive the relationship between sample variance and number of Monte Carlo simulations, each number between 5 and 200 was tested with a 1000 sample bootstrap being carried out for each one. By finding the average time to complete each process (parallelised or non-parallelised) over 10 repeats, the following results were obtained.
 
@@ -743,12 +743,12 @@ The run time on the parallelised method was found to be consistently lower than 
 
 
 ## Conclusion
-Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of different tournament formats in football.
+Throughout this project we made use of R and SAS statistical software to create a Shiny web app, design and deploy an efficient bootstrapping and Jackknife method as well as to run Monte Carlo simulations to investigate sampling distributions and analyse the effect of a given tournament format in football.
 
 ### Collaboration & Using GitHub
 For this project, each team member initially took responsibility for one of the tasks, based upon their programming experience, strengths and preferences. Each person focused on their own task to begin with, working towards the solution and deliverable. Throughout this process, team members also collaborated with each other for assistance and/or feedback regarding certain parts of the tasks. Once an initial draft was completed, each part was then presented to the entire team, allowing for corrections/feedback. This process enabled us to continuously improve upon our work.
 
-For collaborative coding, we used a GitHub repository that was shared with the entire team. Separate folders were created for the 3 tasks (the Shiny app was stored in a separate repository) to provide a clear file structure. Using regular commits and Readme files ensured that everyone could clearly see how far each task was coming along and what conclusions and results have been obtained.
+For collaborative coding, we used a GitHub repository that was shared with the entire team. Separate folders were created for the 3 tasks (the Shiny app was stored in a separate repository) to provide a clear file structure. Using regular commits and Readme files ensured that everyone could clearly see how each task is progressing and what conclusions and results have been obtained.
 
 ### Task Outcomes
 For each task, we implemented the adequate code in R or SAS to produce the required deliverable and draw conclusions about the techniques investigated.
@@ -757,13 +757,13 @@ For each task, we implemented the adequate code in R or SAS to produce the requi
 For the Shiny task, we have created a US Stock Analyser app. This Shiny app imports data from a stock market API to display stock quotes, charts, analyst predictions as well as company information and news. The UI elements enable the user to select relevant inputs and to refresh and download the data. Stock market web apps such as this are used every day by traders, journalists and other stakeholders to keep track of the financial markets.
 
 #### Bootstrapping (SAS)
-In the bootstrapping section we modified the regBoot algorithm in SAS and used the SURVEYSELECT procedure to create a much more efficient bootstrapping method, enabling us to efficiently calculate coefficients for a linear model. This new procedure was able to run 50,000 loops of the bootstrap in just 3.69 seconds instead of more than 23 minutes for the original code. Improving the efficiency of code, such as done in this task, is essential for statisticians. Efficient algorithms in research or industry are essential, as programmers often work with very large number bootstrap samples and may be constrained by computing power due budget limitations.
+In the bootstrapping section we modified the regBoot algorithm in SAS and used the SURVEYSELECT procedure to create a much more efficient bootstrapping method, enabling us to efficiently calculate coefficients for a linear model. This new procedure was able to run 50,000 loops of the bootstrap in just 3.69 seconds instead of more than 23 minutes for the original code. Improving the efficiency of code, such as done in this task, is essential for statisticians. Efficient algorithms in research or industry are crucial, as programmers often work with very large number bootstrap samples and may be constrained by computing power due budget limitations.
 
 #### Jackknife (SAS)
-For the Jackknife task, we have created and implemented code for an efficient Jackknife method, to estimate the standard error of the mean seal lengths for the data provided. Our method provided an identical result to the analytic estimate, with a run time of just 0.308s. As with the bootstrap example, such methods are being used and further developed by statisticians around the world to make the computation of statistical estimates more efficient.
+For the Jackknife task, we have created and implemented code for an efficient Jackknife method, to estimate the standard error of the mean seal lengths for the data provided. Our method provided an identical result to the analytic estimate, with a run time of just 0.308s. As with the bootstrap example, methods such as the jackknife algorithm are being used and further developed by statisticians around the world to make the computation of statistical estimates more efficient.
 
 #### Monte Carlo Simulations (R)
-For the final section, we used Monte Carlo simulations to investigate the sample variance of a given sampling distribution and consider the effects of a particular football tournament format. For **part A** we wound that the sample variance of the distribution was inversely related to the number of Monte Carlo simulations carried out. In **part B** we concluded that the particular tournament format allowed teams with expected win probability greater than 80% to win more than the expected proportion of games, and resulted in teams with lower expected win probabilities to win fewer than their expected proportion. Parallelisation was used in this task to reduce the time taken to run the Monte Carlo simulations. 
+For the final section, we used Monte Carlo simulations to investigate the sample variance of a given sampling distribution and consider the effects of a particular football tournament format. For **part A** we found that the sample variance of the distribution was inversely related to the number of Monte Carlo simulations carried out. In **part B** we concluded that the particular tournament format allowed teams with expected win probability greater than 80% to win more than the expected proportion of games, and resulted in teams with lower expected win probabilities to win fewer than their expected proportion. Parallelisation was used in both tasks to reduce the time taken to run the Monte Carlo simulations. 
 
 ### Further Exploration
 While working through this project and the respective tools and methods, we have identified several further avenues of exploration, that could be of interest in subsequent studies.
@@ -774,11 +774,10 @@ While working through this project and the respective tools and methods, we have
 
 * **Jackknife:** In our example the jackknife estimate was identical to the analytical estimate and we could investigate whether that holds for other datasets and variables, in particular those with non-standard distributions.
 
-* **Monte Carlo Simulation:** For the football tournament, it would be informative to explore how further changes to the tournament format, such as by modifying the exit conditions for teams, that might change which teams are benefited. 
+* **Monte Carlo Simulation:** For the football tournament, it would be informative to explore how further changes to the tournament format, such as by modifying the exit conditions for teams, might change which teams are benefited. 
 
 
 ## APPENDIX
-<!-- Full code snippets of the tasks -->
 
 
 #### regBootUpdated CODE FOR TASK [2] BOOTSTRAP
