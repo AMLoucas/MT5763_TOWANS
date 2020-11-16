@@ -287,7 +287,11 @@ Our estimated values from the original data without bootstrap sampling for inter
 
 ## 3 Jackknife (SAS)
 
-For this section we demonstrate a SAS program for obtaining the jackknife estimate of the standard error for the mean of given data. The SAS macro created for this purpose proceeds in the following fashion:
+For this section we demonstrate a SAS program for obtaining the jackknife estimate of the standard error for the mean of given data. The estimate we compute is given by the following equation:
+$$
+SE = \sqrt{\frac{n-1}{n}\sum_{i=1}^{n}(\theta_i - \bar{x})^2}
+$$
+The jackknife method is useful for situations where it is difficult to find a calculate an estimator or the standard error of that estimator. This is often the case when the quantity we want to the compute the variance of is some relatively complex function of a standard statistic, where typical methods fail as that function may not have a closed-form integral [McIntosh 2016, 2].
 
 ### 3.1 Jackknife Macro
 
@@ -463,7 +467,11 @@ run;
 
 Table: Table 3.3.1. Results of Jacknife Estimate for Error
 
-As we can see here our Jackknife process is slightly less efficient than calculating the standard error analytically. We found the exact same value for the standard error as the analytical method so we can infer that we have a reliable estimate. 
+As we can see here our Jackknife process is slightly less efficient than calculating the standard error analytically. We found the exact same value for the standard error as the analytical method so we can infer that we have a reliable estimate.
+
+In retrospect, this was probably not a very useful application of the jackknife method. A valid analytical method for calculating the standard error was available and easier to compute. The analytical method does assume that the distribution of the data is symmetric, but this was clearly true for the seal length data (see QQnorm plot and histogram in appendix). 
+
+It was not surprising that the jackknife provided a reliable estimate as we have independence of observations, and the quantity we were estimating is a linear function of the parameters, so the main assumptions of the jackknife method were fulfilled [McIntosh 2016, 6]. 
 
 
 ## 4 Monte Carlo simulation (R)
@@ -776,6 +784,9 @@ While working through this project and the respective tools and methods, we have
 
 * **Monte Carlo Simulation:** For the football tournament, it would be informative to explore how further changes to the tournament format, such as by modifying the exit conditions for teams, might change which teams are benefited. 
 
+## References
+
+The Jackknife Estimation Method. Avery McIntosh. eprint arXiv:1606.00497, 2016.
 
 ## APPENDIX
 
@@ -1029,6 +1040,16 @@ data _null_;
   put 30*'-' / ' TOTAL DURATION:' dur time13.2 / 30*'-';
 run;
 ```
+ 	
+#### Jackknife Plots
+```{r, echo=FALSE, fig.align='center',  out.width="70%", out.height="70%", fig.cap="FIGURE A.1: Histogram of Seal Lengths"}
+include_graphics("TASK2/SealHist.png")
+```
+
+```{r, echo=FALSE, fig.align='center', out.width="70%", out.height="70%", fig.cap="FIGURE A.2: QQNORM Plot of Seal Lengths"}
+include_graphics("TASK2/QQSeals.png")
+```
+ 	
  	
 #### CODE FOR TASK [4A] Monte Carlo Simulations
 ``` {r, eval = FALSE}
