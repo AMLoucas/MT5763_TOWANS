@@ -1031,4 +1031,249 @@ data _null_;
 run;
 ```
  	
- 	
+#### CODE FOR TASK [4A] Monte Carlo Simulations
+``` {r, eval = FALSE}
+# Monte Carlo simulation
+
+library(tidyverse)
+library(doParallel)
+library(parallel)
+# Question 1 - Compute the probability
+
+# Simulate the observed data
+set.seed(45214)           # for reproducibility
+N <- 1000                 # Specify the number of datasets to be simulated
+x <- rnorm(N,4,sqrt(10))  # create the "observed" data for x
+y <- runif(N,2,8)         # create the "observed" data for y
+
+# calculate the probability
+p <- sum(x > y)/N
+print(p)
+
+#------------------------------
+
+#Question 2 - Bootstrapping
+
+# create data
+regData <- data.frame(x,y)
+
+# Define a function called BootStrap for bootstrapping
+# with variables inputData and nBoot
+BootStrap <- function(inputData, nBoot){
+  
+  set.seed(56337)   # for reproducibility
+  bootResults <- array(dim=c(nBoot, 1))  # results
+  
+  # Loop across all samples
+  for(i in 1:nBoot){
+    
+    # resample our data with replacement
+    bootData <- inputData[sample(1:nrow(inputData), nrow(inputData), replace = T),]
+    
+    # find the number for X>Y
+    tot <- sum(bootData[,1] > bootData[,2])
+    
+    # Store results
+    bootResults[i] <- tot/nrow(inputData)
+    
+  }
+  
+  bootResults
+  
+} # end of function
+
+
+# derive the sample variance
+sample_distri <- BootStrap(regData,nBoot = 1000)
+
+# Plot the histogram
+ggplot(data.frame(sample_distri)) +
+  geom_histogram(aes(sample_distri), colour = "black", fill = "orange", alpha = 0.1) +
+  geom_vline(xintercept = p, col="purple", lwd=1) +
+  ggtitle("Histogram of Pr(X>Y)") +
+  xlab("Pr(X > Y)") +
+  ylab("Frequency") 
+
+
+#-----------------------------
+
+# Question 3 - how sample variance varies with No. of simulations
+
+
+
+# Loop through varying numbers of MC simulations
+# from 5 to 200
+nSim <- seq(5, 200)
+
+# Non - parallelised version
+# Create empty data frame to append estimations to
+sample_var_final <- data.frame(number_of_simulations = nSim, variance = rep(NA, length(nSim)))
+
+for (k in nSim){
+  
+  # Simulate observed data
+  set.seed(45214)           # for reproducibility
+  x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
+  y <- runif(k,2,8)         # create the "observed" data for y
+  regData2 <- data.frame(x,y)
+  
+  # Bootstrapping to derive each sampling distribution
+  # for number of MC simulations with value k
+  sample_distri <- BootStrap(regData2,nBoot = 1000)
+  
+  # Store variance of sample distribution for this iteration
+  
+  sample_var_final[which(sample_var_final$number_of_simulations == k),]$variance <- var(sample_distri)
+}
+
+
+# Parallelise
+nCores <- detectCores() # no. of cores
+cl <- makeCluster(spec = nCores, type = "PSOCK")
+registerDoParallel(cl)
+
+
+sample_var_final <- foreach(k = nSim, .combine='rbind', .multicombine=TRUE) %dopar% {
+  set.seed(45214)           # for reproducibility
+  x <- rnorm(k,4,sqrt(10))  # create the "observed" data for x
+  y <- runif(k,2,8)         # create the "observed" data for y
+  regData2 <- data.frame(x,y)
+  sample_distri <- BootStrap(regData2,nBoot = 1000)
+  number_of_simulations <- k
+  variance <- var(sample_distri)
+  data.frame(number_of_simulations, variance)
+}
+
+stopCluster(cl)
+
+# build the linear model for inverse sample variance and number of MC simulations
+mdl <- lm(1/variance ~ number_of_simulations, data = sample_var_final)
+
+# Plot the graph of variance against number of simulations
+ggplot(sample_var_final) +
+  geom_point(aes(x = number_of_simulations, y = 1/variance), colour = "orange") +
+  xlab("Number of Monte Carlo simulations") +
+  ylab("Inverse variance of sample distribution") +
+  ggtitle("Sample variance against number of simulations") +
+  geom_abline(aes(intercept=mdl$coefficients[1],slope=mdl$coefficients[2]))
+
+ggplot(sample_var_final) +
+  geom_point(aes(x = number_of_simulations, y = variance), colour = "orange") +
+  geom_smooth(aes(x = number_of_simulations,y = variance), se = FALSE) +
+  xlab("Number of Monte Carlo simulations") +
+  ylab("Variance of sample distribution") +
+  ggtitle("Sample variance against number of simulations")
+
+```
+
+#### CODE FOR TASK [4B] Monte Carlo Simulations
+```{r, eval = FALSE}
+# Problem 4b
+library(tidyverse)
+library(doParallel)
+library(parallel)
+
+# tournament format: a team keeps playing until they accrue 
+# 7 wins or 3 losses (whichever comes first - no draws allowed). 
+# Assume a fixed win rate p ∈ [0, 1] across all rounds
+# (they are paired at random).
+
+# Base tournament set up with repeats and data store
+# Initialisation
+
+# function takes fixed p between 0 and 1 and 1 replicate as default 
+tournament <- function(p = runif(1, min = 0, max = 1), NRepeat = 1) {
+                    
+  totalWins <- rep(NA, NRepeat)       # win store
+  totalLosses <- rep(NA, NRepeat)     # loss store
+  totalMatches <- rep(NA, NRepeat)    # matches store
+  
+  # run tournament
+  set.seed(231215)             # reproducibility
+  
+  for (i in seq(NRepeat)) {
+    nWins <- 0                   # set win counter
+    nLosses <- 0                 # set loss counter
+  
+    while(nLosses < 3 & nWins < 7) {      # set stopping condition
+        result <- rbinom(n = 1, size = 1, prob = p)   # simulate game result
+       
+        if (result == 0) {  # 0 - loss
+          nLosses <- nLosses + 1
+        }
+        
+        if (result == 1) { # 1 - win
+          nWins <- nWins + 1
+        }
+        
+        nMatches <- nWins + nLosses            # find number of matches
+    }
+    
+    totalLosses[i] <- nLosses              # record wins, losses, matches and probabilities
+    totalWins[i] <- nWins                  
+    totalMatches[i] <- nMatches
+  
+  }
+  return(list(losses = totalLosses,         
+              matches = totalMatches,
+              wins = totalWins, 
+              probability = p
+             ))
+}
+
+
+
+#Plot how the total number of matches played (i.e. wins + losses) 
+#varies as a function of p.
+
+pseq <- seq(0,1,0.01) # probability sequence
+
+# Parallelise
+nCores <- detectCores() # no. of cores
+cl <- makeCluster(spec = nCores, type = "PSOCK")
+registerDoParallel(cl)
+
+
+averages <- foreach(p = pseq, .combine='rbind', .multicombine=TRUE) %dopar% {
+  sim <- tournament(p, 10000)
+  matches <-(mean(sim$matches))
+  rate <- (mean(sim$wins/sim$matches))
+  data.frame(p, matches, rate)
+}
+
+stopCluster(cl)
+
+ggplot(averages, aes(x = p, y = matches)) +     # plot total matches against probability
+  geom_point() +
+  xlab("Assumed win rate") +
+  ylab("Total Number of Matches") +
+  ggtitle("Number of matches vs Assumed win Rate") +
+  geom_smooth(se = FALSE) +
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  scale_y_continuous(breaks = seq(min(matchProb$matches), max(matchProb$matches) + 1)) 
+
+
+
+# Comment on the observed win rate relative to the assumed win rate p 
+# (i.e. if a team obtains 2 wins - 3 losses, the maximum likelihood 
+# point estimate for their win rate is 40%). Specifically, focus on the
+# effect driven by the format of this tournament.
+
+# plots to back up commentary 
+ggplot(averages, aes(x = p, y = rate)) +     # plot win rate against probability
+  geom_point() +
+  xlab("Assumed win rate") +
+  ylab("Observed win rate") +
+  ggtitle("Observed Win Rate v Assumed win rate") +
+  geom_smooth(se = FALSE) +
+  geom_abline(aes(intercept = 0, slope = 1)) +
+  scale_x_continuous(breaks = seq(0,1,0.1)) +
+  scale_y_continuous(breaks = seq(0,1,0.1))
+
+ggplot(averages, aes(x = p, y = (rate-p))) +     # plot win rate against probability
+  geom_point() +
+  xlab("Assumed win rate") +
+  ylab("Observed Difference") +
+  ggtitle("Observed differences between assumed win rate and observed win rate") +
+  scale_x_continuous(breaks = seq(0,1,0.1)) 
+```
