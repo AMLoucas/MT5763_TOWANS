@@ -291,11 +291,8 @@ For this section we demonstrate a SAS program for obtaining the jackknife estima
 $$
 SE = \sqrt{\frac{n-1}{n}\sum_{i=1}^{n}(\theta_i - \bar{x})^2}
 $$
-<<<<<<< HEAD
-The jackknife method is useful for situations where it is difficult to find and calculate an estimator or the standard error of that estimator. This is often the case when the quantity we want to the compute the variance of is some relatively complex function of a standard statistic, where typical methods fail as that function may not have a closed-form integral [McIntosh 2016, 2].
-=======
+
 The jackknife method is useful for situations where it is difficult to calculate an estimator or the standard error of that estimator. This is often the case when the quantity we want to the compute the variance of is some relatively complex function of a standard statistic, where typical methods fail as that function may not have a closed-form integral [McIntosh 2016, 2].
->>>>>>> 8abee734262f363c14a05361e41396c65234d0a3
 
 ### 3.1 Jackknife Macro
 
